@@ -1,12 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useMicrophoneVolume } from "../hooks/useMicrophoneVolume";
-import { Application, extend } from "@pixi/react";
-import { Container, Graphics } from "pixi.js";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useMicrophoneVolume } from '../hooks/useMicrophoneVolume';
+import { Application, extend } from '@pixi/react';
+import { Container, Graphics, Sprite } from 'pixi.js';
+import { RollingBotSprite } from '../sprites/RollingBotSprite';
 
 // 擴展 PIXI.js 的容器與繪圖功能
 extend({
   Container,
   Graphics,
+  Sprite,
 });
 
 // 遊戲相關常數
@@ -34,12 +36,12 @@ const GameCanvas = () => {
   const velocityRef = useRef(0); // 用於追蹤角色的垂直速度
 
   // 繪製玩家角色
-  const drawPlayer = useCallback((graphics: Graphics) => {
-    graphics.clear();
-    graphics.fill(0xfa0);
-    graphics.rect(0, 0, 100, 100);
-    graphics.fill();
-  }, []);
+  // const drawPlayer = useCallback((graphics: Graphics) => {
+  //   graphics.clear();
+  //   graphics.fill(0xfa0);
+  //   graphics.rect(0, 0, 100, 100);
+  //   graphics.fill();
+  // }, []);
 
   // 繪製障礙物
   const drawObstacle = useCallback((graphics: Graphics) => {
@@ -64,11 +66,11 @@ const GameCanvas = () => {
         resetGame(); // 如果遊戲結束，重置遊戲
       }
     };
-    window.addEventListener("click", handleRestart); // 點擊事件
-    window.addEventListener("keydown", handleRestart); // 鍵盤事件
+    window.addEventListener('click', handleRestart); // 點擊事件
+    window.addEventListener('keydown', handleRestart); // 鍵盤事件
     return () => {
-      window.removeEventListener("click", handleRestart);
-      window.removeEventListener("keydown", handleRestart);
+      window.removeEventListener('click', handleRestart);
+      window.removeEventListener('keydown', handleRestart);
     };
   }, [isGameOver]);
 
@@ -144,15 +146,21 @@ const GameCanvas = () => {
       resizeTo={window}
       autoDensity
       antialias
-      backgroundColor={"#ccc"}
+      backgroundColor={'#ccc'}
     >
       {/* 玩家角色 */}
-      <pixiContainer x={100} y={y}>
-        <pixiGraphics draw={drawPlayer} />
+      <pixiContainer
+        x={100}
+        y={y}
+      >
+        <RollingBotSprite />
       </pixiContainer>
 
       {/* 障礙物，+20 讓它站在地面 */}
-      <pixiContainer x={obstacleX} y={GROUND_Y + 20}>
+      <pixiContainer
+        x={obstacleX}
+        y={GROUND_Y + 20}
+      >
         <pixiGraphics draw={drawObstacle} />
       </pixiContainer>
     </Application>
