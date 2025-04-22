@@ -1,5 +1,7 @@
+import GameCanvas from "./components/GameCanvas";
+
 function App() {
-  return <div className='text-red-500'>sound runner</div>;
+  return <GameCanvas />;
 }
 
 export default App;
