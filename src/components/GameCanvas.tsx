@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useMicrophoneVolume } from "../hooks/useMicrophoneVolume";
 import { Application, extend } from "@pixi/react";
 import { Container, Graphics } from "pixi.js";
@@ -8,42 +8,71 @@ extend({
   Graphics,
 });
 
-const BASE_Y = 300; // 正常位置的 y
-const JUMP_HEIGHT = 200; // 最大跳躍高度
-const VOLUME_THRESHOLD = 5; // 小於這個音量就不動作
-const LERP_FACTOR = 0.1; // 越小越平滑（0.1~0.2 比較自然）
+const BASE_Y = 300;
+const GROUND_Y = BASE_Y;
+const GRAVITY = 1.2;
+const JUMP_MULTIPLIER = 0.6;
+const MAX_JUMP_FORCE = 20;
+const VOLUME_THRESHOLD = 5;
+
+const OBSTACLE_WIDTH = 40;
+const OBSTACLE_HEIGHT = 80;
+const OBSTACLE_SPEED = 5;
+const GAME_WIDTH = 800; // 可依實際畫面大小調整
 
 const GameCanvas = () => {
   const volume = useMicrophoneVolume();
-  const [squarePosition, setSquarePosition] = useState({ x: 100, y: BASE_Y });
 
-  const drawCallback = useCallback((graphics: Graphics) => {
+  const [y, setY] = useState(BASE_Y);
+  const [obstacleX, setObstacleX] = useState(GAME_WIDTH);
+
+  const velocityRef = useRef(0);
+
+  const drawPlayer = useCallback((graphics: Graphics) => {
     graphics.clear();
     graphics.fill(0xfa0);
     graphics.rect(0, 0, 100, 100);
     graphics.fill();
   }, []);
 
+  const drawObstacle = useCallback((graphics: Graphics) => {
+    graphics.clear();
+    graphics.fill(0x3399ff); // 藍色障礙物
+    graphics.rect(0, 0, OBSTACLE_WIDTH, OBSTACLE_HEIGHT);
+    graphics.fill();
+  }, []);
+
   // 監聽音量變化，更新正方形位置
   useEffect(() => {
-    let targetY = BASE_Y;
-
-    if (volume >= VOLUME_THRESHOLD) {
-      const normalized = Math.min(
-        (volume - VOLUME_THRESHOLD) / (50 - VOLUME_THRESHOLD),
-        1
-      );
-      targetY = BASE_Y - normalized * JUMP_HEIGHT;
-    }
-
-    // 使用 requestAnimationFrame 來平滑過渡到 targetY
     let animationFrameId: number;
 
     const update = () => {
-      setSquarePosition((prev) => {
-        const newY = prev.y + (targetY - prev.y) * LERP_FACTOR;
-        return { ...prev, y: newY };
+      // 音量夠大 → 向上跳
+      if (volume > VOLUME_THRESHOLD) {
+        const jumpForce = Math.min(
+          (volume - VOLUME_THRESHOLD) * JUMP_MULTIPLIER,
+          MAX_JUMP_FORCE
+        );
+        velocityRef.current = -jumpForce;
+      }
+
+      // 更新玩家位置（重力 + 跳）
+      velocityRef.current += GRAVITY;
+      setY((prevY) => {
+        let newY = prevY + velocityRef.current;
+        if (newY > GROUND_Y) {
+          newY = GROUND_Y;
+          velocityRef.current = 0;
+        }
+        return newY;
       });
+
+      // 更新障礙物位置
+      setObstacleX((prevX) => {
+        const nextX = prevX - OBSTACLE_SPEED;
+        return nextX < -OBSTACLE_WIDTH ? GAME_WIDTH : nextX;
+      });
+
       animationFrameId = requestAnimationFrame(update);
     };
 
@@ -53,10 +82,16 @@ const GameCanvas = () => {
   }, [volume]);
 
   return (
-    // 背景顏色白色
-    <Application width={800} height={600} backgroundColor={"#ccc"}>
-      <pixiContainer x={squarePosition.x} y={squarePosition.y}>
-        <pixiGraphics draw={drawCallback} />
+    <Application width={GAME_WIDTH} height={600} backgroundColor={"#ccc"}>
+      {/* 玩家角色 */}
+      <pixiContainer x={100} y={y}>
+        <pixiGraphics draw={drawPlayer} />
+      </pixiContainer>
+
+      {/* 障礙物 */}
+      <pixiContainer x={obstacleX} y={GROUND_Y + 20}>
+        {/* +20 讓它站在地面 */}
+        <pixiGraphics draw={drawObstacle} />
       </pixiContainer>
     </Application>
   );
