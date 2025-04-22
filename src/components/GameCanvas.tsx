@@ -20,7 +20,7 @@ const VOLUME_THRESHOLD = 5; // 音量閾值
 const OBSTACLE_WIDTH = 40; // 障礙物寬度
 const OBSTACLE_HEIGHT = 80; // 障礙物高度
 const OBSTACLE_SPEED = 5; // 障礙物移動速度
-const GAME_WIDTH = 800; // 遊戲畫面寬度
+const GAME_WIDTH = window.innerWidth; // 遊戲畫面寬度
 
 const GameCanvas = () => {
   // 麥克風音量
@@ -140,7 +140,12 @@ const GameCanvas = () => {
   }, [volume, y, obstacleX, isGameOver]);
 
   return (
-    <Application width={GAME_WIDTH} height={600} backgroundColor={"#ccc"}>
+    <Application
+      resizeTo={window}
+      autoDensity
+      antialias
+      backgroundColor={"#ccc"}
+    >
       {/* 玩家角色 */}
       <pixiContainer x={100} y={y}>
         <pixiGraphics draw={drawPlayer} />
