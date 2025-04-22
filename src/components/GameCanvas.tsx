@@ -25,6 +25,7 @@ const GameCanvas = () => {
 
   const [y, setY] = useState(BASE_Y);
   const [obstacleX, setObstacleX] = useState(GAME_WIDTH);
+  const [isGameOver, setIsGameOver] = useState(false);
 
   const velocityRef = useRef(0);
 
@@ -42,14 +43,36 @@ const GameCanvas = () => {
     graphics.fill();
   }, []);
 
+  // 重置遊戲狀態
+  const resetGame = () => {
+    setY(BASE_Y);
+    setObstacleX(GAME_WIDTH);
+    velocityRef.current = 0;
+    setIsGameOver(false);
+  };
+
+  // 監聽點擊或鍵盤事件來重啟遊戲
+  useEffect(() => {
+    const handleRestart = () => {
+      if (isGameOver) {
+        resetGame();
+      }
+    };
+    window.addEventListener("click", handleRestart);
+    window.addEventListener("keydown", handleRestart);
+    return () => {
+      window.removeEventListener("click", handleRestart);
+      window.removeEventListener("keydown", handleRestart);
+    };
+  }, [isGameOver]);
+
   // 監聽音量變化，更新正方形位置
   useEffect(() => {
+    if (isGameOver) return;
+
     let animationFrameId: number;
-    let isGameOver = false;
 
     const update = () => {
-      if (isGameOver) return;
-
       // 處理跳躍
       if (volume > VOLUME_THRESHOLD) {
         const jumpForce = Math.min(
@@ -76,7 +99,7 @@ const GameCanvas = () => {
         return nextX < -OBSTACLE_WIDTH ? GAME_WIDTH : nextX;
       });
 
-      // ✅ 碰撞偵測
+      // 碰撞偵測
       const player = {
         x: 100,
         y: y,
@@ -97,8 +120,7 @@ const GameCanvas = () => {
         player.y + player.height > obstacle.y;
 
       if (isColliding) {
-        isGameOver = true;
-        alert("Game Over!");
+        setIsGameOver(true);
         return;
       }
 
@@ -107,7 +129,7 @@ const GameCanvas = () => {
 
     animationFrameId = requestAnimationFrame(update);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [volume, y, obstacleX]);
+  }, [volume, y, obstacleX, isGameOver]);
 
   return (
     <Application width={GAME_WIDTH} height={600} backgroundColor={"#ccc"}>
