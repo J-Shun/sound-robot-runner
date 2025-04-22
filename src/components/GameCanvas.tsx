@@ -8,12 +8,12 @@ extend({
   Graphics,
 });
 
-const BASE_Y = 300;
-const GROUND_Y = BASE_Y;
-const GRAVITY = 1.2;
-const JUMP_MULTIPLIER = 0.6;
-const MAX_JUMP_FORCE = 20;
-const VOLUME_THRESHOLD = 5;
+const BASE_Y = 300; // 基準 Y 軸位置
+const GROUND_Y = BASE_Y; // 地面 Y 軸位置
+const GRAVITY = 1.2; // 重力加速度
+const JUMP_MULTIPLIER = 0.6; // 跳躍力道乘數
+const MAX_JUMP_FORCE = 20; // 最大跳躍力道
+const VOLUME_THRESHOLD = 5; // 音量閾值
 
 const OBSTACLE_WIDTH = 40;
 const OBSTACLE_HEIGHT = 80;
@@ -45,9 +45,12 @@ const GameCanvas = () => {
   // 監聽音量變化，更新正方形位置
   useEffect(() => {
     let animationFrameId: number;
+    let isGameOver = false;
 
     const update = () => {
-      // 音量夠大 → 向上跳
+      if (isGameOver) return;
+
+      // 處理跳躍
       if (volume > VOLUME_THRESHOLD) {
         const jumpForce = Math.min(
           (volume - VOLUME_THRESHOLD) * JUMP_MULTIPLIER,
@@ -56,7 +59,7 @@ const GameCanvas = () => {
         velocityRef.current = -jumpForce;
       }
 
-      // 更新玩家位置（重力 + 跳）
+      // 處理重力
       velocityRef.current += GRAVITY;
       setY((prevY) => {
         let newY = prevY + velocityRef.current;
@@ -67,19 +70,44 @@ const GameCanvas = () => {
         return newY;
       });
 
-      // 更新障礙物位置
+      // 移動障礙物
       setObstacleX((prevX) => {
         const nextX = prevX - OBSTACLE_SPEED;
         return nextX < -OBSTACLE_WIDTH ? GAME_WIDTH : nextX;
       });
 
+      // ✅ 碰撞偵測
+      const player = {
+        x: 100,
+        y: y,
+        width: 100,
+        height: 100,
+      };
+      const obstacle = {
+        x: obstacleX,
+        y: GROUND_Y + 20,
+        width: OBSTACLE_WIDTH,
+        height: OBSTACLE_HEIGHT,
+      };
+
+      const isColliding =
+        player.x < obstacle.x + obstacle.width &&
+        player.x + player.width > obstacle.x &&
+        player.y < obstacle.y + obstacle.height &&
+        player.y + player.height > obstacle.y;
+
+      if (isColliding) {
+        isGameOver = true;
+        alert("Game Over!");
+        return;
+      }
+
       animationFrameId = requestAnimationFrame(update);
     };
 
     animationFrameId = requestAnimationFrame(update);
-
     return () => cancelAnimationFrame(animationFrameId);
-  }, [volume]);
+  }, [volume, y, obstacleX]);
 
   return (
     <Application width={GAME_WIDTH} height={600} backgroundColor={"#ccc"}>
