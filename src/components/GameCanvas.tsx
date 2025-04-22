@@ -3,11 +3,13 @@ import { useMicrophoneVolume } from "../hooks/useMicrophoneVolume";
 import { Application, extend } from "@pixi/react";
 import { Container, Graphics } from "pixi.js";
 
+// 擴展 PIXI.js 的容器與繪圖功能
 extend({
   Container,
   Graphics,
 });
 
+// 遊戲相關常數
 const BASE_Y = 300; // 基準 Y 軸位置
 const GROUND_Y = BASE_Y; // 地面 Y 軸位置
 const GRAVITY = 1.2; // 重力加速度
@@ -15,20 +17,23 @@ const JUMP_MULTIPLIER = 0.6; // 跳躍力道乘數
 const MAX_JUMP_FORCE = 20; // 最大跳躍力道
 const VOLUME_THRESHOLD = 5; // 音量閾值
 
-const OBSTACLE_WIDTH = 40;
-const OBSTACLE_HEIGHT = 80;
-const OBSTACLE_SPEED = 5;
-const GAME_WIDTH = 800; // 可依實際畫面大小調整
+const OBSTACLE_WIDTH = 40; // 障礙物寬度
+const OBSTACLE_HEIGHT = 80; // 障礙物高度
+const OBSTACLE_SPEED = 5; // 障礙物移動速度
+const GAME_WIDTH = 800; // 遊戲畫面寬度
 
 const GameCanvas = () => {
+  // 麥克風音量
   const volume = useMicrophoneVolume();
 
-  const [y, setY] = useState(BASE_Y);
-  const [obstacleX, setObstacleX] = useState(GAME_WIDTH);
-  const [isGameOver, setIsGameOver] = useState(false);
+  // 狀態管理
+  const [y, setY] = useState(BASE_Y); // 玩家角色的 Y 軸位置
+  const [obstacleX, setObstacleX] = useState(GAME_WIDTH); // 障礙物的 X 軸位置
+  const [isGameOver, setIsGameOver] = useState(false); // 遊戲是否結束
 
-  const velocityRef = useRef(0);
+  const velocityRef = useRef(0); // 用於追蹤角色的垂直速度
 
+  // 繪製玩家角色
   const drawPlayer = useCallback((graphics: Graphics) => {
     graphics.clear();
     graphics.fill(0xfa0);
@@ -36,9 +41,10 @@ const GameCanvas = () => {
     graphics.fill();
   }, []);
 
+  // 繪製障礙物
   const drawObstacle = useCallback((graphics: Graphics) => {
     graphics.clear();
-    graphics.fill(0x3399ff); // 藍色障礙物
+    graphics.fill(0x3399ff);
     graphics.rect(0, 0, OBSTACLE_WIDTH, OBSTACLE_HEIGHT);
     graphics.fill();
   }, []);
@@ -55,37 +61,38 @@ const GameCanvas = () => {
   useEffect(() => {
     const handleRestart = () => {
       if (isGameOver) {
-        resetGame();
+        resetGame(); // 如果遊戲結束，重置遊戲
       }
     };
-    window.addEventListener("click", handleRestart);
-    window.addEventListener("keydown", handleRestart);
+    window.addEventListener("click", handleRestart); // 點擊事件
+    window.addEventListener("keydown", handleRestart); // 鍵盤事件
     return () => {
       window.removeEventListener("click", handleRestart);
       window.removeEventListener("keydown", handleRestart);
     };
   }, [isGameOver]);
 
-  // 監聽音量變化，更新正方形位置
+  // 監聽音量變化，更新角色與障礙物位置
   useEffect(() => {
     if (isGameOver) return;
 
     let animationFrameId: number;
 
     const update = () => {
-      // 處理跳躍
+      // 處理跳躍邏輯
       if (volume > VOLUME_THRESHOLD) {
         const jumpForce = Math.min(
-          (volume - VOLUME_THRESHOLD) * JUMP_MULTIPLIER,
-          MAX_JUMP_FORCE
+          (volume - VOLUME_THRESHOLD) * JUMP_MULTIPLIER, // 計算跳躍力道
+          MAX_JUMP_FORCE // 限制最大跳躍力道
         );
-        velocityRef.current = -jumpForce;
+        velocityRef.current = -jumpForce; // 設定向上的速度
       }
 
-      // 處理重力
+      // 處理重力邏輯
       velocityRef.current += GRAVITY;
       setY((prevY) => {
         let newY = prevY + velocityRef.current;
+        // 限制角色不會掉到地面以下，抵達地面時速度歸零
         if (newY > GROUND_Y) {
           newY = GROUND_Y;
           velocityRef.current = 0;
@@ -93,7 +100,7 @@ const GameCanvas = () => {
         return newY;
       });
 
-      // 移動障礙物
+      // 障礙物向左移動，如果超出畫面則重置位置
       setObstacleX((prevX) => {
         const nextX = prevX - OBSTACLE_SPEED;
         return nextX < -OBSTACLE_WIDTH ? GAME_WIDTH : nextX;
@@ -108,11 +115,12 @@ const GameCanvas = () => {
       };
       const obstacle = {
         x: obstacleX,
-        y: GROUND_Y + 20,
+        y: GROUND_Y + 20, // 障礙物的 Y 軸位置 (+20 讓它站在地面)
         width: OBSTACLE_WIDTH,
         height: OBSTACLE_HEIGHT,
       };
 
+      // 判斷是否發生碰撞
       const isColliding =
         player.x < obstacle.x + obstacle.width &&
         player.x + player.width > obstacle.x &&
@@ -128,7 +136,7 @@ const GameCanvas = () => {
     };
 
     animationFrameId = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(animationFrameId);
+    return () => cancelAnimationFrame(animationFrameId); // 清除動畫幀
   }, [volume, y, obstacleX, isGameOver]);
 
   return (
@@ -138,9 +146,8 @@ const GameCanvas = () => {
         <pixiGraphics draw={drawPlayer} />
       </pixiContainer>
 
-      {/* 障礙物 */}
+      {/* 障礙物，+20 讓它站在地面 */}
       <pixiContainer x={obstacleX} y={GROUND_Y + 20}>
-        {/* +20 讓它站在地面 */}
         <pixiGraphics draw={drawObstacle} />
       </pixiContainer>
     </Application>
