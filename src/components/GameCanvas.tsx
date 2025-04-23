@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useMicrophoneVolume } from "../hooks/useMicrophoneVolume";
-import { Application, extend } from "@pixi/react";
-import { Container, Graphics, Sprite, AnimatedSprite } from "pixi.js";
+import { Application } from "@pixi/react";
+import { Graphics } from "pixi.js";
 import { RollingBotSprite } from "../sprites/RollingBotSprite";
 import {
   BASE_Y,
@@ -15,14 +15,6 @@ import {
   OBSTACLE_SPEED,
   GAME_WIDTH,
 } from "../constants";
-
-// 擴展 PIXI.js 的容器與繪圖功能
-extend({
-  Container,
-  Graphics,
-  Sprite,
-  AnimatedSprite,
-});
 
 const GameCanvas = () => {
   // 麥克風音量

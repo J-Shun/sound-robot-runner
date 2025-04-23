@@ -33,7 +33,6 @@ export function RollingBotSprite() {
   // 動畫循環
   useEffect(() => {
     if (textures.length === 0 || !spriteRef.current) return;
-    console.log(textures);
 
     const sprite = spriteRef.current;
     sprite.textures = textures;
