@@ -25,6 +25,10 @@ const GameCanvas = () => {
   const [obstacleX, setObstacleX] = useState(GAME_WIDTH); // 障礙物的 X 軸位置
   const [isGameOver, setIsGameOver] = useState(false); // 遊戲是否結束
 
+  const [score, setScore] = useState(0); // 分數
+  const startTimeRef = useRef<number | null>(null); // 遊戲開始時間
+  const lastScoreUpdateRef = useRef<number>(0); // 上次更新時間
+
   const velocityRef = useRef(0); // 用於追蹤角色的垂直速度
 
   // 繪製障礙物
@@ -41,6 +45,10 @@ const GameCanvas = () => {
     setObstacleX(GAME_WIDTH);
     velocityRef.current = 0;
     setIsGameOver(false);
+
+    setScore(0);
+    startTimeRef.current = null;
+    lastScoreUpdateRef.current = 0;
   };
 
   // 監聽點擊或鍵盤事件來重啟遊戲
@@ -65,6 +73,18 @@ const GameCanvas = () => {
     let animationFrameId: number;
 
     const update = () => {
+      const now = Date.now();
+
+      if (startTimeRef.current === null) {
+        startTimeRef.current = now;
+      }
+
+      if (now - lastScoreUpdateRef.current > 100) {
+        const elapsed = now - startTimeRef.current;
+        setScore(Math.floor(elapsed / 100)); // 每 0.1 秒加一分
+        lastScoreUpdateRef.current = now;
+      }
+
       // 處理跳躍邏輯
       if (volume > VOLUME_THRESHOLD) {
         const jumpForce = Math.min(
@@ -106,6 +126,16 @@ const GameCanvas = () => {
       antialias
       backgroundColor={"#ccc"}
     >
+      <pixiContainer x={20} y={20}>
+        <pixiText
+          text={`score: ${score}`}
+          style={{
+            fontSize: 16,
+            fill: "#000000",
+          }}
+        />
+      </pixiContainer>
+
       {/* 地板 */}
       <pixiContainer>
         <pixiGraphics
