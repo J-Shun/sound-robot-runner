@@ -14,6 +14,7 @@ import {
   OBSTACLE_SPEED,
   OBSTACLE_Y,
   GAME_WIDTH,
+  PLAYER_HEIGHT,
 } from "../constants";
 
 const GameCanvas = () => {
@@ -149,7 +150,7 @@ const GameCanvas = () => {
       </pixiContainer>
 
       {/* 玩家角色 */}
-      <pixiContainer x={100} y={y}>
+      <pixiContainer x={100} y={y - PLAYER_HEIGHT}>
         <RollingBotSprite />
       </pixiContainer>
 

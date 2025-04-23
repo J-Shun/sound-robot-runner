@@ -1,6 +1,11 @@
 import { Assets, Texture, Graphics, AnimatedSprite } from "pixi.js";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { PLAYER_X, PLAYER_Y } from "../constants/config";
+import {
+  PLAYER_X,
+  PLAYER_Y,
+  PLAYER_WIDTH,
+  PLAYER_HEIGHT,
+} from "../constants/config";
 
 import rollingBot1 from "../assets/rolling-bot.png?url";
 import rollingBot2 from "../assets/rolling-bot2.png?url";
@@ -11,8 +16,9 @@ export function RollingBotSprite() {
 
   // 在圖片載入後決定 hitBox 尺寸
   const drawHitBox = useCallback((graphics: Graphics) => {
-    const width = 96 - 16;
-    const height = 96 - 9;
+    // size = 96x96
+    const width = PLAYER_WIDTH;
+    const height = PLAYER_HEIGHT;
 
     graphics.clear(); // 確保重繪時不會堆疊
     graphics.rect(11, 3, width, height); // anchor = 1 的情況
