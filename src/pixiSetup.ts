@@ -1,5 +1,12 @@
-import { Container, Graphics, Sprite, AnimatedSprite, Text } from "pixi.js";
-import { extend } from "@pixi/react";
+import {
+  Container,
+  Graphics,
+  Sprite,
+  AnimatedSprite,
+  Text,
+  TilingSprite,
+} from 'pixi.js';
+import { extend } from '@pixi/react';
 
 extend({
   Container,
@@ -7,4 +14,5 @@ extend({
   Sprite,
   AnimatedSprite,
   Text,
+  TilingSprite,
 });

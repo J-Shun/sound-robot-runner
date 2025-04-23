@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useMicrophoneVolume } from "../hooks/useMicrophoneVolume";
-import { Application } from "@pixi/react";
-import { Graphics } from "pixi.js";
-import { RollingBotSprite } from "../sprites/RollingBotSprite";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useMicrophoneVolume } from '../hooks/useMicrophoneVolume';
+import { Application } from '@pixi/react';
+import { Graphics } from 'pixi.js';
+import { RollingBotSprite } from '../sprites/RollingBotSprite';
+import { DesertTile } from '../sprites/DesertTile';
 import {
   GROUND_Y,
   GRAVITY,
@@ -15,7 +16,7 @@ import {
   OBSTACLE_Y,
   GAME_WIDTH,
   PLAYER_HEIGHT,
-} from "../constants";
+} from '../constants';
 
 const GameCanvas = () => {
   // 麥克風音量
@@ -59,11 +60,11 @@ const GameCanvas = () => {
         resetGame(); // 如果遊戲結束，重置遊戲
       }
     };
-    window.addEventListener("click", handleRestart); // 點擊事件
-    window.addEventListener("keydown", handleRestart); // 鍵盤事件
+    window.addEventListener('click', handleRestart); // 點擊事件
+    window.addEventListener('keydown', handleRestart); // 鍵盤事件
     return () => {
-      window.removeEventListener("click", handleRestart);
-      window.removeEventListener("keydown", handleRestart);
+      window.removeEventListener('click', handleRestart);
+      window.removeEventListener('keydown', handleRestart);
     };
   }, [isGameOver]);
 
@@ -125,37 +126,39 @@ const GameCanvas = () => {
       resizeTo={window}
       autoDensity
       antialias
-      backgroundColor={"#ccc"}
+      backgroundColor={'#ccc'}
     >
-      <pixiContainer x={20} y={20}>
+      <pixiContainer
+        x={20}
+        y={20}
+      >
         <pixiText
           text={`score: ${score}`}
           style={{
             fontSize: 16,
-            fill: "#000000",
+            fill: '#000000',
           }}
         />
       </pixiContainer>
 
-      {/* 地板 */}
+      {/* 沙漠地面 */}
       <pixiContainer>
-        <pixiGraphics
-          draw={(graphics) => {
-            graphics.clear();
-            graphics.moveTo(0, GROUND_Y);
-            graphics.lineTo(GAME_WIDTH, GROUND_Y);
-            graphics.stroke({ color: "#000000", pixelLine: true });
-          }}
-        />
+        <DesertTile />
       </pixiContainer>
 
       {/* 玩家角色 */}
-      <pixiContainer x={100} y={y - PLAYER_HEIGHT}>
+      <pixiContainer
+        x={100}
+        y={y - PLAYER_HEIGHT}
+      >
         <RollingBotSprite />
       </pixiContainer>
 
       {/* 讓它站在地面 */}
-      <pixiContainer x={obstacleX} y={OBSTACLE_Y}>
+      <pixiContainer
+        x={obstacleX}
+        y={OBSTACLE_Y}
+      >
         <pixiGraphics draw={drawObstacle} />
       </pixiContainer>
     </Application>
