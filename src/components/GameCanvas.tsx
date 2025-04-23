@@ -4,7 +4,6 @@ import { Application } from "@pixi/react";
 import { Graphics } from "pixi.js";
 import { RollingBotSprite } from "../sprites/RollingBotSprite";
 import {
-  BASE_Y,
   GROUND_Y,
   GRAVITY,
   JUMP_MULTIPLIER,
@@ -13,6 +12,7 @@ import {
   OBSTACLE_WIDTH,
   OBSTACLE_HEIGHT,
   OBSTACLE_SPEED,
+  OBSTACLE_Y,
   GAME_WIDTH,
 } from "../constants";
 
@@ -21,7 +21,7 @@ const GameCanvas = () => {
   const volume = useMicrophoneVolume();
 
   // 狀態管理
-  const [y, setY] = useState(BASE_Y); // 玩家角色的 Y 軸位置
+  const [y, setY] = useState(GROUND_Y); // 玩家角色的 Y 軸位置
   const [obstacleX, setObstacleX] = useState(GAME_WIDTH); // 障礙物的 X 軸位置
   const [isGameOver, setIsGameOver] = useState(false); // 遊戲是否結束
 
@@ -37,7 +37,7 @@ const GameCanvas = () => {
 
   // 重置遊戲狀態
   const resetGame = () => {
-    setY(BASE_Y);
+    setY(GROUND_Y);
     setObstacleX(GAME_WIDTH);
     velocityRef.current = 0;
     setIsGameOver(false);
@@ -92,32 +92,6 @@ const GameCanvas = () => {
         return nextX < -OBSTACLE_WIDTH ? GAME_WIDTH : nextX;
       });
 
-      // 碰撞偵測
-      const player = {
-        x: 100,
-        y: y,
-        width: 100,
-        height: 100,
-      };
-      const obstacle = {
-        x: obstacleX,
-        y: GROUND_Y + 20, // 障礙物的 Y 軸位置 (+20 讓它站在地面)
-        width: OBSTACLE_WIDTH,
-        height: OBSTACLE_HEIGHT,
-      };
-
-      // 判斷是否發生碰撞
-      const isColliding =
-        player.x < obstacle.x + obstacle.width &&
-        player.x + player.width > obstacle.x &&
-        player.y < obstacle.y + obstacle.height &&
-        player.y + player.height > obstacle.y;
-
-      if (isColliding) {
-        // setIsGameOver(true);
-        return;
-      }
-
       animationFrameId = requestAnimationFrame(update);
     };
 
@@ -132,13 +106,25 @@ const GameCanvas = () => {
       antialias
       backgroundColor={"#ccc"}
     >
+      {/* 地板 */}
+      <pixiContainer>
+        <pixiGraphics
+          draw={(graphics) => {
+            graphics.clear();
+            graphics.moveTo(0, GROUND_Y);
+            graphics.lineTo(GAME_WIDTH, GROUND_Y);
+            graphics.stroke({ color: "#000000", pixelLine: true });
+          }}
+        />
+      </pixiContainer>
+
       {/* 玩家角色 */}
       <pixiContainer x={100} y={y}>
         <RollingBotSprite />
       </pixiContainer>
 
-      {/* 障礙物，+20 讓它站在地面 */}
-      <pixiContainer x={obstacleX} y={GROUND_Y + 20}>
+      {/* 讓它站在地面 */}
+      <pixiContainer x={obstacleX} y={OBSTACLE_Y}>
         <pixiGraphics draw={drawObstacle} />
       </pixiContainer>
     </Application>

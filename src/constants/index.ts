@@ -1,12 +1,1 @@
-export {
-  BASE_Y,
-  GROUND_Y,
-  GRAVITY,
-  JUMP_MULTIPLIER,
-  MAX_JUMP_FORCE,
-  VOLUME_THRESHOLD,
-  OBSTACLE_WIDTH,
-  OBSTACLE_HEIGHT,
-  OBSTACLE_SPEED,
-  GAME_WIDTH,
-} from "./config";
+export * from "./config";

@@ -15,7 +15,8 @@ export function RollingBotSprite() {
     const height = 96 - 9;
 
     graphics.clear(); // 確保重繪時不會堆疊
-    graphics.rect(-width / 2 + 3, -height / 2, width, height); // 因為 anchor = 0.5
+    graphics.rect(11, 3, width, height); // anchor = 1 的情況
+    // graphics.rect(-width / 2 + 3, -height / 2, width, height); // anchor = 0.5 的情況
     graphics.stroke({ color: "#ff0000", width: 1 });
   }, []);
 
@@ -52,7 +53,7 @@ export function RollingBotSprite() {
           <pixiGraphics draw={drawHitBox} />
           <pixiAnimatedSprite
             ref={spriteRef}
-            anchor={0.5}
+            // anchor={0.5}
             eventMode={"static"}
             textures={textures}
           />
