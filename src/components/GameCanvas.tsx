@@ -1,28 +1,28 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useMicrophoneVolume } from '../hooks/useMicrophoneVolume';
-import { Application, extend } from '@pixi/react';
-import { Container, Graphics, Sprite } from 'pixi.js';
-import { RollingBotSprite } from '../sprites/RollingBotSprite';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useMicrophoneVolume } from "../hooks/useMicrophoneVolume";
+import { Application, extend } from "@pixi/react";
+import { Container, Graphics, Sprite, AnimatedSprite } from "pixi.js";
+import { RollingBotSprite } from "../sprites/RollingBotSprite";
+import {
+  BASE_Y,
+  GROUND_Y,
+  GRAVITY,
+  JUMP_MULTIPLIER,
+  MAX_JUMP_FORCE,
+  VOLUME_THRESHOLD,
+  OBSTACLE_WIDTH,
+  OBSTACLE_HEIGHT,
+  OBSTACLE_SPEED,
+  GAME_WIDTH,
+} from "../constants";
 
 // 擴展 PIXI.js 的容器與繪圖功能
 extend({
   Container,
   Graphics,
   Sprite,
+  AnimatedSprite,
 });
-
-// 遊戲相關常數
-const BASE_Y = 300; // 基準 Y 軸位置
-const GROUND_Y = BASE_Y; // 地面 Y 軸位置
-const GRAVITY = 1.2; // 重力加速度
-const JUMP_MULTIPLIER = 0.6; // 跳躍力道乘數
-const MAX_JUMP_FORCE = 20; // 最大跳躍力道
-const VOLUME_THRESHOLD = 5; // 音量閾值
-
-const OBSTACLE_WIDTH = 40; // 障礙物寬度
-const OBSTACLE_HEIGHT = 80; // 障礙物高度
-const OBSTACLE_SPEED = 5; // 障礙物移動速度
-const GAME_WIDTH = window.innerWidth; // 遊戲畫面寬度
 
 const GameCanvas = () => {
   // 麥克風音量
@@ -34,14 +34,6 @@ const GameCanvas = () => {
   const [isGameOver, setIsGameOver] = useState(false); // 遊戲是否結束
 
   const velocityRef = useRef(0); // 用於追蹤角色的垂直速度
-
-  // 繪製玩家角色
-  // const drawPlayer = useCallback((graphics: Graphics) => {
-  //   graphics.clear();
-  //   graphics.fill(0xfa0);
-  //   graphics.rect(0, 0, 100, 100);
-  //   graphics.fill();
-  // }, []);
 
   // 繪製障礙物
   const drawObstacle = useCallback((graphics: Graphics) => {
@@ -66,11 +58,11 @@ const GameCanvas = () => {
         resetGame(); // 如果遊戲結束，重置遊戲
       }
     };
-    window.addEventListener('click', handleRestart); // 點擊事件
-    window.addEventListener('keydown', handleRestart); // 鍵盤事件
+    window.addEventListener("click", handleRestart); // 點擊事件
+    window.addEventListener("keydown", handleRestart); // 鍵盤事件
     return () => {
-      window.removeEventListener('click', handleRestart);
-      window.removeEventListener('keydown', handleRestart);
+      window.removeEventListener("click", handleRestart);
+      window.removeEventListener("keydown", handleRestart);
     };
   }, [isGameOver]);
 
@@ -130,7 +122,7 @@ const GameCanvas = () => {
         player.y + player.height > obstacle.y;
 
       if (isColliding) {
-        setIsGameOver(true);
+        // setIsGameOver(true);
         return;
       }
 
@@ -146,21 +138,15 @@ const GameCanvas = () => {
       resizeTo={window}
       autoDensity
       antialias
-      backgroundColor={'#ccc'}
+      backgroundColor={"#ccc"}
     >
       {/* 玩家角色 */}
-      <pixiContainer
-        x={100}
-        y={y}
-      >
+      <pixiContainer x={100} y={y}>
         <RollingBotSprite />
       </pixiContainer>
 
       {/* 障礙物，+20 讓它站在地面 */}
-      <pixiContainer
-        x={obstacleX}
-        y={GROUND_Y + 20}
-      >
+      <pixiContainer x={obstacleX} y={GROUND_Y + 20}>
         <pixiGraphics draw={drawObstacle} />
       </pixiContainer>
     </Application>
