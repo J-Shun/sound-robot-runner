@@ -1,14 +1,14 @@
-import { Assets, Texture, Graphics, AnimatedSprite } from "pixi.js";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { Assets, Texture, Graphics, AnimatedSprite } from 'pixi.js';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   PLAYER_X,
   PLAYER_Y,
   PLAYER_WIDTH,
   PLAYER_HEIGHT,
-} from "../constants/config";
+} from '../constants/config';
 
-import rollingBot1 from "../assets/rolling-bot.png?url";
-import rollingBot2 from "../assets/rolling-bot2.png?url";
+import rollingBot1 from '../assets/rolling-bot-87x90-1.png?url';
+import rollingBot2 from '../assets/rolling-bot-87x90-2.png?url';
 
 export function RollingBotSprite() {
   const spriteRef = useRef<AnimatedSprite | null>(null);
@@ -21,9 +21,9 @@ export function RollingBotSprite() {
     const height = PLAYER_HEIGHT;
 
     graphics.clear(); // 確保重繪時不會堆疊
-    graphics.rect(11, 3, width, height); // anchor = 1 的情況
+    graphics.rect(0, 0, width, height); // anchor = 1 的情況
     // graphics.rect(-width / 2 + 3, -height / 2, width, height); // anchor = 0.5 的情況
-    graphics.stroke({ color: "#ff0000", width: 1 });
+    graphics.stroke({ color: '#ff0000', width: 1 });
   }, []);
 
   // 預載圖片
@@ -52,7 +52,10 @@ export function RollingBotSprite() {
   }, [textures]);
 
   return (
-    <pixiContainer x={PLAYER_X} y={PLAYER_Y}>
+    <pixiContainer
+      x={PLAYER_X}
+      y={PLAYER_Y}
+    >
       {textures.length !== 0 && (
         <>
           {/* Hitbox 與 Sprite 為同一個 container 的子項 */}
@@ -60,7 +63,7 @@ export function RollingBotSprite() {
           <pixiAnimatedSprite
             ref={spriteRef}
             // anchor={0.5}
-            eventMode={"static"}
+            eventMode={'static'}
             textures={textures}
           />
         </>

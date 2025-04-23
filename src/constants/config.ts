@@ -7,8 +7,8 @@ const JUMP_MULTIPLIER = 0.6; // 跳躍力道乘數
 const MAX_JUMP_FORCE = 20; // 最大跳躍力道
 const VOLUME_THRESHOLD = 5; // 音量閾值
 
-const PLAYER_WIDTH = 80; // 角色寬度
-const PLAYER_HEIGHT = 87; // 角色高度
+const PLAYER_WIDTH = 87; // 角色寬度
+const PLAYER_HEIGHT = 90; // 角色高度
 const PLAYER_X = 0; // 角色 X 軸位置
 const PLAYER_Y = 0; // 角色 Y 軸位置
 
