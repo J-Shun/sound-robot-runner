@@ -1,7 +1,7 @@
 const GAME_WIDTH = window.innerWidth; // 遊戲畫面寬度
 const GAME_HEIGHT = window.innerHeight; // 遊戲畫面高度
 
-const GROUND_Y = GAME_HEIGHT / 2; // 基準 Y 軸位置
+const GROUND_Y = GAME_HEIGHT / 1.5; // 基準 Y 軸位置
 const GRAVITY = 1.2; // 重力加速度
 const JUMP_MULTIPLIER = 0.6; // 跳躍力道乘數
 const MAX_JUMP_FORCE = 20; // 最大跳躍力道
