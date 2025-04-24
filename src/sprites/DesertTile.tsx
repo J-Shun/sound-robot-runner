@@ -1,9 +1,9 @@
-import { Assets, Texture, TilingSprite } from "pixi.js";
-import { useEffect, useState, useRef } from "react";
-import { GAME_WIDTH, GROUND_Y, OBSTACLE_SPEED } from "../constants/config";
+import { Assets, Texture, TilingSprite } from 'pixi.js';
+import { useEffect, useState, useRef } from 'react';
+import { GAME_WIDTH, GROUND_Y, OBSTACLE_SPEED } from '../constants/config';
 
-import desertTile from "../assets/desert-tile-3x.png?url";
-import desertColorTile from "../assets/desert-color-tile-3x.png?url";
+import desertTile from '../assets/desert-tile-3x.png?url';
+import desertColorTile from '../assets/desert-color-tile-3x.png?url';
 
 export function DesertTile() {
   const [groundTexture, setGroundTexture] = useState<Texture | null>(null);

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 export function useMicrophoneVolume() {
   // 用於儲存計算出的麥克風音量的狀態

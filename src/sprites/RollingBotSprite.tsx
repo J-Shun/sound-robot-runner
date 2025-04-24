@@ -52,10 +52,7 @@ export function RollingBotSprite() {
   }, [textures]);
 
   return (
-    <pixiContainer
-      x={PLAYER_X}
-      y={PLAYER_Y}
-    >
+    <pixiContainer x={PLAYER_X} y={PLAYER_Y}>
       {textures.length !== 0 && (
         <>
           {/* Hitbox 與 Sprite 為同一個 container 的子項 */}
