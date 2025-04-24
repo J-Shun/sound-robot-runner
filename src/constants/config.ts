@@ -9,8 +9,8 @@ const VOLUME_THRESHOLD = 5; // 音量閾值
 
 const PLAYER_WIDTH = 87; // 角色寬度
 const PLAYER_HEIGHT = 90; // 角色高度
-const PLAYER_X = 0; // 角色 X 軸位置
-const PLAYER_Y = 0; // 角色 Y 軸位置
+const PLAYER_X = 200; // 角色 X 軸位置，因為角色從左上角開始，所以需要加上寬度的一半
+const PLAYER_ORIGINAL_Y = GROUND_Y - PLAYER_HEIGHT; // 角色原始 Y 軸位置（角色頭的座標）
 
 const OBSTACLE_WIDTH = 40; // 障礙物寬度
 const OBSTACLE_HEIGHT = 80; // 障礙物高度
@@ -32,5 +32,5 @@ export {
   PLAYER_WIDTH,
   PLAYER_HEIGHT,
   PLAYER_X,
-  PLAYER_Y,
+  PLAYER_ORIGINAL_Y,
 };

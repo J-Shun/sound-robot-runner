@@ -5,8 +5,8 @@ import { Graphics } from 'pixi.js';
 import { RollingBotSprite } from '../sprites/RollingBotSprite';
 import { DesertTile } from '../sprites/DesertTile';
 import {
-  GROUND_Y,
   GRAVITY,
+  PLAYER_X,
   JUMP_MULTIPLIER,
   MAX_JUMP_FORCE,
   VOLUME_THRESHOLD,
@@ -15,7 +15,7 @@ import {
   OBSTACLE_SPEED,
   OBSTACLE_Y,
   GAME_WIDTH,
-  PLAYER_HEIGHT,
+  PLAYER_ORIGINAL_Y,
 } from '../constants';
 
 const GameCanvas = () => {
@@ -23,7 +23,7 @@ const GameCanvas = () => {
   const volume = useMicrophoneVolume();
 
   // 狀態管理
-  const [y, setY] = useState(GROUND_Y); // 玩家角色的 Y 軸位置
+  const [y, setY] = useState(PLAYER_ORIGINAL_Y); // 玩家角色的 Y 軸位置
   const [obstacleX, setObstacleX] = useState(GAME_WIDTH); // 障礙物的 X 軸位置
   const [isGameOver, setIsGameOver] = useState(false); // 遊戲是否結束
 
@@ -43,7 +43,7 @@ const GameCanvas = () => {
 
   // 重置遊戲狀態
   const resetGame = () => {
-    setY(GROUND_Y);
+    setY(PLAYER_ORIGINAL_Y);
     setObstacleX(GAME_WIDTH);
     velocityRef.current = 0;
     setIsGameOver(false);
@@ -101,8 +101,8 @@ const GameCanvas = () => {
       setY((prevY) => {
         let newY = prevY + velocityRef.current;
         // 限制角色不會掉到地面以下，抵達地面時速度歸零
-        if (newY > GROUND_Y) {
-          newY = GROUND_Y;
+        if (newY > PLAYER_ORIGINAL_Y) {
+          newY = PLAYER_ORIGINAL_Y;
           velocityRef.current = 0;
         }
         return newY;
@@ -144,7 +144,7 @@ const GameCanvas = () => {
       </pixiContainer>
 
       {/* 玩家角色 */}
-      <pixiContainer x={100} y={y - PLAYER_HEIGHT}>
+      <pixiContainer x={PLAYER_X} y={y}>
         <RollingBotSprite />
       </pixiContainer>
 

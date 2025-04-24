@@ -1,8 +1,6 @@
 import { Assets, Texture, Graphics, AnimatedSprite } from 'pixi.js';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import {
-  PLAYER_X,
-  PLAYER_Y,
   PLAYER_WIDTH,
   PLAYER_HEIGHT,
 } from '../constants/config';
@@ -16,13 +14,11 @@ export function RollingBotSprite() {
 
   // 在圖片載入後決定 hitBox 尺寸
   const drawHitBox = useCallback((graphics: Graphics) => {
-    // size = 96x96
     const width = PLAYER_WIDTH;
     const height = PLAYER_HEIGHT;
 
     graphics.clear(); // 確保重繪時不會堆疊
-    graphics.rect(0, 0, width, height); // anchor = 1 的情況
-    // graphics.rect(-width / 2 + 3, -height / 2, width, height); // anchor = 0.5 的情況
+    graphics.rect(-width / 2, -height / 2, width, height);
     graphics.stroke({ color: '#ff0000', width: 1 });
   }, []);
 
@@ -52,14 +48,15 @@ export function RollingBotSprite() {
   }, [textures]);
 
   return (
-    <pixiContainer x={PLAYER_X} y={PLAYER_Y}>
+    // 因為 anchor 設置在中心 0.5，圖片往左上角位移，所以要將 x, y 加上角色寬度和高度的一半
+    <pixiContainer x={PLAYER_WIDTH / 2} y={PLAYER_HEIGHT / 2}>
       {textures.length !== 0 && (
         <>
           {/* Hitbox 與 Sprite 為同一個 container 的子項 */}
           <pixiGraphics draw={drawHitBox} />
           <pixiAnimatedSprite
             ref={spriteRef}
-            // anchor={0.5}
+            anchor={0.5}
             eventMode={'static'}
             textures={textures}
           />
