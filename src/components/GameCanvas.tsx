@@ -21,7 +21,10 @@ import {
 const GameCanvas = () => {
   // 麥克風音量
   const volume = useMicrophoneVolume();
-
+  // 使用四捨五入法來獲取音量
+  const roundedVolume = Math.round(volume);
+  console.log(roundedVolume);
+  
   // 狀態管理
   const [y, setY] = useState(PLAYER_ORIGINAL_Y); // 玩家角色的 Y 軸位置
   const [obstacleX, setObstacleX] = useState(GAME_WIDTH); // 障礙物的 X 軸位置
@@ -100,6 +103,11 @@ const GameCanvas = () => {
       velocityRef.current += GRAVITY;
       setY((prevY) => {
         let newY = prevY + velocityRef.current;
+        // 限制角色跳的高度不會超過 300px
+        if (newY < PLAYER_ORIGINAL_Y - 300) {
+          newY = PLAYER_ORIGINAL_Y - 300;
+          velocityRef.current = 0;
+        }
         // 限制角色不會掉到地面以下，抵達地面時速度歸零
         if (newY > PLAYER_ORIGINAL_Y) {
           newY = PLAYER_ORIGINAL_Y;
