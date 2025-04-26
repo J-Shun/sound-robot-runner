@@ -4,6 +4,7 @@ import { Application } from '@pixi/react';
 import { Graphics } from 'pixi.js';
 import { RollingBotSprite } from '../sprites/RollingBotSprite';
 import { DesertTile } from '../sprites/DesertTile';
+import { SunsetBackground } from '../sprites/SunsetBackground';
 import {
   GRAVITY,
   PLAYER_X,
@@ -22,9 +23,9 @@ const GameCanvas = () => {
   // 麥克風音量
   const volume = useMicrophoneVolume();
   // 使用四捨五入法來獲取音量
-  const roundedVolume = Math.round(volume);
-  console.log(roundedVolume);
-  
+  // const roundedVolume = Math.round(volume);
+  // console.log(roundedVolume);
+
   // 狀態管理
   const [y, setY] = useState(PLAYER_ORIGINAL_Y); // 玩家角色的 Y 軸位置
   const [obstacleX, setObstacleX] = useState(GAME_WIDTH); // 障礙物的 X 軸位置
@@ -136,7 +137,10 @@ const GameCanvas = () => {
       antialias
       backgroundColor={'#ccc'}
     >
-      <pixiContainer x={20} y={20}>
+      <pixiContainer
+        x={20}
+        y={20}
+      >
         <pixiText
           text={`score: ${score}`}
           style={{
@@ -146,18 +150,29 @@ const GameCanvas = () => {
         />
       </pixiContainer>
 
+      {/* 日落背景 */}
+      <pixiContainer>
+        <SunsetBackground />
+      </pixiContainer>
+
       {/* 沙漠地面 */}
       <pixiContainer>
         <DesertTile />
       </pixiContainer>
 
       {/* 玩家角色 */}
-      <pixiContainer x={PLAYER_X} y={y}>
+      <pixiContainer
+        x={PLAYER_X}
+        y={y}
+      >
         <RollingBotSprite />
       </pixiContainer>
 
       {/* 讓它站在地面 */}
-      <pixiContainer x={obstacleX} y={OBSTACLE_Y}>
+      <pixiContainer
+        x={obstacleX}
+        y={OBSTACLE_Y}
+      >
         <pixiGraphics draw={drawObstacle} />
       </pixiContainer>
     </Application>
