@@ -44,6 +44,7 @@ export function RollingBotSprite() {
     useState<Texture | null>(null);
 
   const chargeRef = useRef(0);
+  const chargeTimeRef = useRef(0);
   // 判斷進入哪個集氣的哪個階段
   const phaseRef = useRef(0);
 
@@ -60,8 +61,6 @@ export function RollingBotSprite() {
       const busterSprite = busterRef.current;
       const mouseX = event.clientX;
       const mouseY = event.clientY;
-
-      console.log('Mouse X:', mouseX, 'Mouse Y:', mouseY);
 
       // 計算手砲與滑鼠的相對位置
       const deltaX = mouseX - busterSprite.x - PLAYER_X; // 減去機器人的 X 位置
@@ -89,32 +88,48 @@ export function RollingBotSprite() {
     let animationFrameId: number;
 
     const update = () => {
-      if (volume > 5 && chargeRef.current < 300) {
-        chargeRef.current += volume * 0.05;
-        if (chargeRef.current > 300) {
-          chargeRef.current = 300;
-        }
-      }
-
       const sprite = busterRef.current;
-
       if (!sprite) return;
 
-      if (chargeRef.current > 100 && phaseRef.current === 0) {
+      // if (chargeRef.current > 50 && phaseRef.current === 0) {
+      //   sprite.textures = [busterBlueTextures[0], busterBlueTextures[1]];
+      //   sprite.animationSpeed = 0.2;
+      //   sprite.play();
+      //   phaseRef.current = 1;
+      // } else if (chargeRef.current > 100 && phaseRef.current === 1) {
+      //   sprite.textures = [busterBlueTextures[2], busterBlueTextures[3]];
+      //   sprite.animationSpeed = 0.2;
+      //   sprite.play();
+      //   phaseRef.current = 2;
+      // } else if (chargeRef.current > 150 && phaseRef.current === 2) {
+      //   sprite.textures = [busterBlueTextures[4], busterBlueTextures[5]];
+      //   sprite.animationSpeed = 0.2;
+      //   sprite.play();
+      //   phaseRef.current = 3;
+      // }
+
+      if (chargeTimeRef.current > 105 && phaseRef.current === 0) {
         sprite.textures = [busterBlueTextures[0], busterBlueTextures[1]];
         sprite.animationSpeed = 0.2;
         sprite.play();
         phaseRef.current = 1;
-      } else if (chargeRef.current > 150 && phaseRef.current === 1) {
+      } else if (chargeTimeRef.current > 210 && phaseRef.current === 1) {
         sprite.textures = [busterBlueTextures[2], busterBlueTextures[3]];
         sprite.animationSpeed = 0.2;
         sprite.play();
         phaseRef.current = 2;
-      } else if (chargeRef.current > 200 && phaseRef.current === 2) {
+      } else if (chargeTimeRef.current > 315 && phaseRef.current === 2) {
         sprite.textures = [busterBlueTextures[4], busterBlueTextures[5]];
         sprite.animationSpeed = 0.2;
         sprite.play();
         phaseRef.current = 3;
+      }
+      // 聲音大於 2 時，才算是開始充能，才能開始累積補充時間
+      // 大於 4 時，速度加快
+      if (volume > 2) {
+        chargeTimeRef.current += 1; // 每 1/60 秒增加 1
+      } else if (volume > 4) {
+        chargeTimeRef.current += 1.1;
       }
       animationFrameId = requestAnimationFrame(update);
     };
