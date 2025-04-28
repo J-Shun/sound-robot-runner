@@ -43,7 +43,6 @@ export function RollingBotSprite() {
   const [busterBlueFullTexture, setBusterBlueFullTexture] =
     useState<Texture | null>(null);
 
-  const chargeRef = useRef(0);
   const chargeTimeRef = useRef(0);
   // 判斷進入哪個集氣的哪個階段
   const phaseRef = useRef(0);
@@ -90,23 +89,6 @@ export function RollingBotSprite() {
     const update = () => {
       const sprite = busterRef.current;
       if (!sprite) return;
-
-      // if (chargeRef.current > 50 && phaseRef.current === 0) {
-      //   sprite.textures = [busterBlueTextures[0], busterBlueTextures[1]];
-      //   sprite.animationSpeed = 0.2;
-      //   sprite.play();
-      //   phaseRef.current = 1;
-      // } else if (chargeRef.current > 100 && phaseRef.current === 1) {
-      //   sprite.textures = [busterBlueTextures[2], busterBlueTextures[3]];
-      //   sprite.animationSpeed = 0.2;
-      //   sprite.play();
-      //   phaseRef.current = 2;
-      // } else if (chargeRef.current > 150 && phaseRef.current === 2) {
-      //   sprite.textures = [busterBlueTextures[4], busterBlueTextures[5]];
-      //   sprite.animationSpeed = 0.2;
-      //   sprite.play();
-      //   phaseRef.current = 3;
-      // }
 
       if (chargeTimeRef.current > 105 && phaseRef.current === 0) {
         sprite.textures = [busterBlueTextures[0], busterBlueTextures[1]];
