@@ -1,16 +1,99 @@
 import { Assets, Texture, Graphics, AnimatedSprite } from 'pixi.js';
 import { useEffect, useRef, useState, useCallback } from 'react';
-import {
-  PLAYER_WIDTH,
-  PLAYER_HEIGHT,
-} from '../constants/config';
+import { useMicrophoneVolume } from '../hooks/useMicrophoneVolume';
+import { PLAYER_WIDTH, PLAYER_HEIGHT } from '../constants/config';
 
-import rollingBot1 from '../assets/rolling-bot-87x90-1.png?url';
-import rollingBot2 from '../assets/rolling-bot-87x90-2.png?url';
+import rollingBot1 from '../assets/robot/rolling-bot-body-1.png?url';
+import rollingBot2 from '../assets/robot/rolling-bot-body-2.png?url';
+import robotBuster from '../assets/robot/robot-buster.png?url';
+import robotBuserBlue1 from '../assets/robot/robot-buster-blue-1.png?url';
+import robotBuserBlue2 from '../assets/robot/robot-buster-blue-2.png?url';
+import robotBuserBlue3 from '../assets/robot/robot-buster-blue-3.png?url';
+import robotBuserBlue4 from '../assets/robot/robot-buster-blue-4.png?url';
+import robotBuserBlue5 from '../assets/robot/robot-buster-blue-5.png?url';
+import robotBuserBlue6 from '../assets/robot/robot-buster-blue-6.png?url';
+import robotBuserBlueFull from '../assets/robot/robot-buster-blue-full.png?url';
+
+const allAssetUrls = [
+  rollingBot1,
+  rollingBot2,
+  robotBuster,
+  robotBuserBlue1,
+  robotBuserBlue2,
+  robotBuserBlue3,
+  robotBuserBlue4,
+  robotBuserBlue5,
+  robotBuserBlue6,
+  robotBuserBlueFull,
+];
 
 export function RollingBotSprite() {
-  const spriteRef = useRef<AnimatedSprite | null>(null);
-  const [textures, setTextures] = useState<Texture[]>([]);
+  const robotRef = useRef<AnimatedSprite | null>(null);
+  const busterRef = useRef<AnimatedSprite | null>(null);
+  const [robotTextures, setRobotTextures] = useState<Texture[]>([]);
+  const [busterDefaultTextures, setBusterDefaultTextures] = useState<Texture[]>(
+    []
+  );
+  const [busterBlueTextures, setBusterBlueTextures] = useState<Texture[]>([]);
+  const [busterBlueFullTexture, setBusterBlueFullTexture] =
+    useState<Texture | null>(null);
+
+  const chargeRef = useRef(0);
+  // 判斷進入哪個集氣的哪個階段
+  const phaseRef = useRef(0);
+
+  const volume = useMicrophoneVolume();
+
+  const isLoaded =
+    robotTextures.length > 0 &&
+    busterBlueTextures.length > 0 &&
+    busterBlueFullTexture !== null;
+
+  // 透過 volume 為手砲累積能量
+  useEffect(() => {
+    if (!isLoaded || !busterRef.current) return;
+
+    let animationFrameId: number;
+
+    // console.log(chargeRef.current);
+
+    const update = () => {
+      if (volume > 5 && chargeRef.current < 300) {
+        chargeRef.current += volume * 0.05;
+        if (chargeRef.current > 300) {
+          chargeRef.current = 300;
+        }
+      }
+
+      const sprite = busterRef.current;
+
+      if (!sprite) return;
+
+      if (chargeRef.current > 100 && phaseRef.current === 0) {
+        sprite.textures = [busterBlueTextures[0], busterBlueTextures[1]];
+        sprite.animationSpeed = 0.2;
+        sprite.play();
+        phaseRef.current = 1;
+      } else if (chargeRef.current > 150 && phaseRef.current === 1) {
+        sprite.textures = [busterBlueTextures[2], busterBlueTextures[3]];
+        sprite.animationSpeed = 0.2;
+        sprite.play();
+        phaseRef.current = 2;
+      } else if (chargeRef.current > 200 && phaseRef.current === 2) {
+        sprite.textures = [busterBlueTextures[4], busterBlueTextures[5]];
+        sprite.animationSpeed = 0.2;
+        sprite.play();
+        phaseRef.current = 3;
+      }
+      animationFrameId = requestAnimationFrame(update);
+    };
+
+    update();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [volume, isLoaded, busterBlueTextures, busterBlueFullTexture]);
 
   // 在圖片載入後決定 hitBox 尺寸
   const drawHitBox = useCallback((graphics: Graphics) => {
@@ -24,41 +107,71 @@ export function RollingBotSprite() {
 
   // 預載圖片
   useEffect(() => {
-    if (textures.length === 0) {
-      Promise.all([Assets.load(rollingBot1), Assets.load(rollingBot2)]).then(
-        (loadedTextures) => {
-          setTextures(loadedTextures);
-        }
-      );
-    }
-  }, [textures]);
+    Promise.all(allAssetUrls.map((url) => Assets.load(url))).then(
+      (textures) => {
+        const robot = [textures[0], textures[1]];
+        const busterDefault = [textures[2]];
+        const busterBlue = [
+          textures[3],
+          textures[4],
+          textures[5],
+          textures[6],
+          textures[7],
+          textures[8],
+        ];
+        const busterBlueFull = textures[9];
 
-  // 動畫循環
+        setRobotTextures(robot);
+        setBusterDefaultTextures(busterDefault);
+        setBusterBlueTextures(busterBlue);
+        setBusterBlueFullTexture(busterBlueFull);
+      }
+    );
+  }, []);
+
+  // 機器人 & 手砲動畫循環
   useEffect(() => {
-    if (textures.length === 0 || !spriteRef.current) return;
+    if (robotTextures.length === 0 || !robotRef.current) return;
+    if (busterDefaultTextures.length === 0 || !busterRef.current) return;
 
-    const sprite = spriteRef.current;
-    sprite.textures = textures;
-    sprite.animationSpeed = 0.1; // 動畫速度
-    sprite.play(); // 開始播放動畫
+    const robotSprite = robotRef.current;
+    robotSprite.textures = robotTextures;
+    robotSprite.animationSpeed = 0.1; // 動畫速度
+    robotSprite.play(); // 開始播放動畫
 
+    const busterSprite = busterRef.current;
+    busterSprite.textures = [busterDefaultTextures[0]];
+
+    // 停止動畫
     return () => {
-      sprite.stop(); // 停止動畫
+      robotSprite.stop();
+      busterSprite.stop();
     };
-  }, [textures]);
+  }, [robotTextures, busterDefaultTextures]);
 
   return (
     // 因為 anchor 設置在中心 0.5，圖片往左上角位移，所以要將 x, y 加上角色寬度和高度的一半
-    <pixiContainer x={PLAYER_WIDTH / 2} y={PLAYER_HEIGHT / 2}>
-      {textures.length !== 0 && (
+    <pixiContainer
+      x={PLAYER_WIDTH / 2}
+      y={PLAYER_HEIGHT / 2}
+    >
+      {isLoaded && (
         <>
           {/* Hitbox 與 Sprite 為同一個 container 的子項 */}
           <pixiGraphics draw={drawHitBox} />
           <pixiAnimatedSprite
-            ref={spriteRef}
+            ref={robotRef}
             anchor={0.5}
             eventMode={'static'}
-            textures={textures}
+            textures={robotTextures}
+          />
+          <pixiAnimatedSprite
+            ref={busterRef}
+            anchor={0.5}
+            x={8}
+            y={6}
+            eventMode={'static'}
+            textures={busterBlueTextures}
           />
         </>
       )}
