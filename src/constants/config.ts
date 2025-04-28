@@ -12,10 +12,15 @@ const PLAYER_HEIGHT = 90; // 角色高度
 const PLAYER_X = 200; // 角色 X 軸位置，因為角色從左上角開始，所以需要加上寬度的一半
 const PLAYER_ORIGINAL_Y = GROUND_Y - PLAYER_HEIGHT; // 角色原始 Y 軸位置（角色頭的座標）
 
+const PATROL_BOT_WIDTH = 78; // 機器人寬度
+const PATROL_BOT_HEIGHT = 96; // 機器人高度
+const PATROL_BOT_X = GAME_WIDTH; // 障礙物 X 軸位置，從右側進入畫面
+const PATROL_BOT_Y = GROUND_Y - PATROL_BOT_HEIGHT; // 障礙物 Y 軸位置
+
 const OBSTACLE_WIDTH = 40; // 障礙物寬度
 const OBSTACLE_HEIGHT = 80; // 障礙物高度
 const OBSTACLE_Y = GROUND_Y - OBSTACLE_HEIGHT; // 障礙物 Y 軸位置
-const OBSTACLE_SPEED = 5; // 障礙物移動速度
+const OBSTACLE_SPEED = 3; // 障礙物移動速度
 
 export {
   GROUND_Y,
@@ -33,4 +38,8 @@ export {
   PLAYER_HEIGHT,
   PLAYER_X,
   PLAYER_ORIGINAL_Y,
+  PATROL_BOT_WIDTH,
+  PATROL_BOT_HEIGHT,
+  PATROL_BOT_X,
+  PATROL_BOT_Y,
 };

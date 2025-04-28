@@ -3,6 +3,7 @@ import { useMicrophoneVolume } from '../hooks/useMicrophoneVolume';
 import { Application } from '@pixi/react';
 import { Graphics } from 'pixi.js';
 import { RollingBotSprite } from '../sprites/RollingBotSprite';
+import { PatrolBotSprite } from '../sprites/PatrolBotSprite';
 import { DesertTile } from '../sprites/DesertTile';
 import { SunsetBackground } from '../sprites/SunsetBackground';
 import {
@@ -17,6 +18,7 @@ import {
   OBSTACLE_Y,
   GAME_WIDTH,
   PLAYER_ORIGINAL_Y,
+  PATROL_BOT_Y,
 } from '../constants';
 
 const GameCanvas = () => {
@@ -166,6 +168,14 @@ const GameCanvas = () => {
         y={y}
       >
         <RollingBotSprite />
+      </pixiContainer>
+
+      {/* 敵人 */}
+      <pixiContainer
+        x={obstacleX}
+        y={PATROL_BOT_Y}
+      >
+        <PatrolBotSprite />
       </pixiContainer>
 
       {/* 讓它站在地面 */}
