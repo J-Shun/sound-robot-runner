@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { useMicrophoneVolume } from '../hooks/useMicrophoneVolume';
 import { Application } from '@pixi/react';
 import { RollingBotSprite } from '../sprites/RollingBotSprite';
 import { PatrolBotSprite } from '../sprites/PatrolBotSprite';
@@ -9,10 +8,7 @@ import { SunsetBackground } from '../sprites/SunsetBackground';
 import {
   GRAVITY,
   PLAYER_X,
-  JUMP_MULTIPLIER,
   MAX_JUMP_FORCE,
-  VOLUME_THRESHOLD,
-  OBSTACLE_WIDTH,
   OBSTACLE_SPEED,
   GAME_WIDTH,
   PLAYER_ORIGINAL_Y,
@@ -20,13 +16,9 @@ import {
 } from '../constants';
 
 const GameCanvas = () => {
-  // 麥克風音量
-  const volume = useMicrophoneVolume();
-
   // 狀態管理
   const [playerY, setPlayerY] = useState(PLAYER_ORIGINAL_Y); // 玩家的 Y 軸位置
   const [patrolBotX, setPatrolBotX] = useState(GAME_WIDTH); // 敵人的 X 軸位置
-  const [isGameOver, setIsGameOver] = useState(false); // 遊戲是否結束
   const [score, setScore] = useState(0); // 分數
 
   const startTimeRef = useRef<number | null>(null); // 遊戲開始時間
@@ -34,37 +26,23 @@ const GameCanvas = () => {
 
   const velocityRef = useRef(0); // 用於追蹤角色的垂直速度
 
-  // 重置遊戲狀態
-  const resetGame = () => {
-    setPlayerY(PLAYER_ORIGINAL_Y);
-    setPatrolBotX(GAME_WIDTH);
-    velocityRef.current = 0;
-    setIsGameOver(false);
-
-    setScore(0);
-    startTimeRef.current = null;
-    lastScoreUpdateRef.current = 0;
-  };
-
-  // 監聽點擊或鍵盤事件來重啟遊戲
   useEffect(() => {
-    const handleRestart = () => {
-      if (isGameOver) {
-        resetGame(); // 如果遊戲結束，重置遊戲
-      }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // 只有站在地上才能使用空白鍵跳躍
+      if (event.code !== 'Space' || playerY !== PLAYER_ORIGINAL_Y) return;
+      const jumpForce = Math.min(MAX_JUMP_FORCE);
+      velocityRef.current = -jumpForce;
     };
-    window.addEventListener('click', handleRestart); // 點擊事件
-    window.addEventListener('keydown', handleRestart); // 鍵盤事件
+
+    document.addEventListener('keydown', handleKeyDown);
+
     return () => {
-      window.removeEventListener('click', handleRestart);
-      window.removeEventListener('keydown', handleRestart);
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isGameOver]);
+  }, [playerY]);
 
   // 監聽音量變化，更新角色與障礙物位置
   useEffect(() => {
-    if (isGameOver) return;
-
     let animationFrameId: number;
 
     const update = () => {
@@ -74,34 +52,27 @@ const GameCanvas = () => {
         startTimeRef.current = now;
       }
 
+      // 每 0.1 秒加一分
       if (now - lastScoreUpdateRef.current > 100) {
         const elapsed = now - startTimeRef.current;
-        setScore(Math.floor(elapsed / 100)); // 每 0.1 秒加一分
+        setScore(Math.floor(elapsed / 100));
         lastScoreUpdateRef.current = now;
       }
 
-      // 處理跳躍邏輯
-      if (volume > VOLUME_THRESHOLD) {
-        const jumpForce = Math.min(
-          (volume - VOLUME_THRESHOLD) * JUMP_MULTIPLIER, // 計算跳躍力道
-          MAX_JUMP_FORCE // 限制最大跳躍力道
-        );
-        velocityRef.current = -jumpForce; // 設定向上的速度
-      }
-
-      // 處理重力邏輯
+      // 更新垂直速度與位置
       velocityRef.current += GRAVITY;
       setPlayerY((prevY) => {
         let newY = prevY + velocityRef.current;
-        // 限制角色跳的高度不會超過 300px
         if (newY < PLAYER_ORIGINAL_Y - 300) {
           newY = PLAYER_ORIGINAL_Y - 300;
           velocityRef.current = 0;
         }
-        // 限制角色不會掉到地面以下，抵達地面時速度歸零
         if (newY > PLAYER_ORIGINAL_Y) {
           newY = PLAYER_ORIGINAL_Y;
           velocityRef.current = 0;
+        }
+        if (velocityRef.current === 0) {
+          newY = PLAYER_ORIGINAL_Y;
         }
         return newY;
       });
@@ -109,7 +80,7 @@ const GameCanvas = () => {
       // 障礙物向左移動，如果超出畫面則重置位置
       setPatrolBotX((prevX) => {
         const nextX = prevX - OBSTACLE_SPEED;
-        return nextX < -OBSTACLE_WIDTH ? GAME_WIDTH : nextX;
+        return nextX < -patrolBotX ? GAME_WIDTH : nextX;
       });
 
       animationFrameId = requestAnimationFrame(update);
@@ -117,7 +88,7 @@ const GameCanvas = () => {
 
     animationFrameId = requestAnimationFrame(update);
     return () => cancelAnimationFrame(animationFrameId); // 清除動畫幀
-  }, [volume, playerY, patrolBotX, isGameOver]);
+  }, [playerY, patrolBotX]);
 
   return (
     <Application
@@ -151,6 +122,7 @@ const GameCanvas = () => {
         <PatrolBotSprite />
       </pixiContainer>
 
+      {/* 計分器 */}
       <pixiContainer x={20} y={20}>
         <pixiText
           text={`score: ${score}`}
