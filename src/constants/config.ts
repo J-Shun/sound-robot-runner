@@ -13,7 +13,7 @@ const PLAYER_ORIGINAL_Y = Math.floor(GROUND_Y - PLAYER_HEIGHT); // 角色原始 
 const FLAME_ORIGINAL_X = PLAYER_ORIGINAL_X + 80; // 火焰 X 軸位置
 const FLAME_ORIGINAL_Y = PLAYER_ORIGINAL_Y + 43; // 火焰 Y 軸位置
 
-const PATROL_BOT_WIDTH = 78; // 巡邏機器人寬度
+const PATROL_BOT_WIDTH = 96; // 巡邏機器人寬度
 const PATROL_BOT_HEIGHT = 96; // 巡邏機器人高度
 const PATROL_BOT_Y = GROUND_Y - PATROL_BOT_HEIGHT; // 巡邏機器人 Y 軸位置
 
