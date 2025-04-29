@@ -1,6 +1,6 @@
 import { Assets, Texture, TilingSprite } from 'pixi.js';
 import { useEffect, useState, useRef } from 'react';
-import { GAME_WIDTH, GROUND_Y, OBSTACLE_SPEED } from '../constants/config';
+import { GAME_WIDTH, GROUND_Y, SPEED } from '../constants/config';
 
 import desertTile from '../assets/desert-tile-3x.png?url';
 import desertColorTile from '../assets/desert-color-tile-3x.png?url';
@@ -29,8 +29,8 @@ export function DesertTile() {
 
     const updateFrame = () => {
       if (tileRef.current) {
-        tileRef.current.tilePosition.x -= OBSTACLE_SPEED;
-        tileColorRef.current!.tilePosition.x -= OBSTACLE_SPEED;
+        tileRef.current.tilePosition.x -= SPEED;
+        tileColorRef.current!.tilePosition.x -= SPEED;
       }
       animationFrameId = requestAnimationFrame(updateFrame);
     };

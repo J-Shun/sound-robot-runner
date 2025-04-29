@@ -10,10 +10,11 @@ import {
   GRAVITY,
   PLAYER_ORIGINAL_X,
   MAX_JUMP_FORCE,
-  OBSTACLE_SPEED,
+  SPEED,
   GAME_WIDTH,
   PLAYER_ORIGINAL_Y,
   PATROL_BOT_Y,
+  PLAYER_SPEED,
 } from '../constants';
 
 const GameCanvas = () => {
@@ -23,22 +24,41 @@ const GameCanvas = () => {
   const playerRef = useRef<Container>(null);
   const patrolBotRef = useRef<Container>(null);
 
+  const isLeftKeyDown = useRef(false);
+  const isRightKeyDown = useRef(false);
+
   const startTimeRef = useRef<number | null>(null); // 遊戲開始時間
   const lastScoreUpdateRef = useRef<number>(0); // 上次更新時間
   const velocityRef = useRef<number>(0); // 用於追蹤角色的垂直速度
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // 只有站在地上才能使用空白鍵跳躍
-      if (event.code !== 'Space' || !playerRef.current) return;
-      if (playerRef.current.y !== PLAYER_ORIGINAL_Y) return;
-      velocityRef.current = -MAX_JUMP_FORCE;
+      if (event.code === 'ArrowLeft') {
+        isLeftKeyDown.current = true;
+      } else if (event.code === 'ArrowRight') {
+        isRightKeyDown.current = true;
+      } else if (
+        event.code === 'Space' &&
+        playerRef.current?.y === PLAYER_ORIGINAL_Y
+      ) {
+        velocityRef.current = -MAX_JUMP_FORCE;
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.code === 'ArrowLeft') {
+        isLeftKeyDown.current = false;
+      } else if (event.code === 'ArrowRight') {
+        isRightKeyDown.current = false;
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
 
@@ -65,7 +85,15 @@ const GameCanvas = () => {
       const patrolBot = patrolBotRef.current;
 
       if (player) {
-        // 更新角色位置（跳躍）
+        // 左右移動
+        if (isLeftKeyDown.current && player.x > 0) {
+          player.x -= PLAYER_SPEED;
+        }
+        if (isRightKeyDown.current && player.x < GAME_WIDTH - player.width) {
+          player.x += PLAYER_SPEED;
+        }
+
+        // 跳躍
         velocityRef.current += GRAVITY;
         player.y += velocityRef.current;
 
@@ -76,12 +104,28 @@ const GameCanvas = () => {
         }
       }
 
-      // 障礙物向左移動，如果超出畫面則重置位置
+      // 巡邏機器人向左移動，如果超出畫面則重置位置
       if (patrolBot) {
         // 更新敵人位置（巡邏）
-        patrolBot.x -= OBSTACLE_SPEED;
+        patrolBot.x -= SPEED;
         if (patrolBot.x < -patrolBot.width) {
           patrolBot.x = GAME_WIDTH;
+        }
+      }
+
+      // 碰撞判斷
+      if (player && patrolBot) {
+        const playerBounds = player.getBounds();
+        const patrolBotBounds = patrolBot.getBounds();
+
+        const isHit =
+          playerBounds.x + playerBounds.width > patrolBotBounds.x &&
+          playerBounds.x < patrolBotBounds.x + patrolBotBounds.width &&
+          playerBounds.y + playerBounds.height > patrolBotBounds.y &&
+          playerBounds.y < patrolBotBounds.y + patrolBotBounds.height;
+
+        if (isHit) {
+          console.log('hit');
         }
       }
 

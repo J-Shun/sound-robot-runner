@@ -14,13 +14,15 @@ const PATROL_BOT_WIDTH = 78; // 巡邏機器人寬度
 const PATROL_BOT_HEIGHT = 96; // 巡邏機器人高度
 const PATROL_BOT_Y = GROUND_Y - PATROL_BOT_HEIGHT; // 巡邏機器人 Y 軸位置
 
-const OBSTACLE_SPEED = 5; // 障礙物移動速度
+const PLAYER_SPEED = 6; // 角色移動速度
+const SPEED = 5; // 移動速度
 
 export {
   GROUND_Y,
   GRAVITY,
   MAX_JUMP_FORCE,
-  OBSTACLE_SPEED,
+  SPEED,
+  PLAYER_SPEED,
   GAME_WIDTH,
   GAME_HEIGHT,
   PLAYER_WIDTH,
