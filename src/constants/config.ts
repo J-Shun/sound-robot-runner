@@ -13,6 +13,11 @@ const PLAYER_ORIGINAL_Y = Math.floor(GROUND_Y - PLAYER_HEIGHT); // 角色原始 
 const FLAME_ORIGINAL_X = PLAYER_ORIGINAL_X + 80; // 火焰 X 軸位置
 const FLAME_ORIGINAL_Y = PLAYER_ORIGINAL_Y + 43; // 火焰 Y 軸位置
 
+const FLAME_WIDTH_S = 45; // 小型火焰寬度
+const FLAME_WIDTH_M = 144; // 中型火焰寬度
+const FLAME_WIDTH_L = 192; // 大型火焰寬度
+const FLAME_HEIGHT = 27; // 火焰高度
+
 const PATROL_BOT_WIDTH = 96; // 巡邏機器人寬度
 const PATROL_BOT_HEIGHT = 96; // 巡邏機器人高度
 const PATROL_BOT_Y = GROUND_Y - PATROL_BOT_HEIGHT; // 巡邏機器人 Y 軸位置
@@ -37,4 +42,8 @@ export {
   PATROL_BOT_WIDTH,
   PATROL_BOT_HEIGHT,
   PATROL_BOT_Y,
+  FLAME_WIDTH_S,
+  FLAME_WIDTH_M,
+  FLAME_WIDTH_L,
+  FLAME_HEIGHT,
 };
