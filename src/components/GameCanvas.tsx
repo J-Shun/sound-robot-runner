@@ -7,7 +7,7 @@ import { RuinBackground } from '../sprites/RuinBackground';
 import { SunsetBackground } from '../sprites/SunsetBackground';
 import {
   GRAVITY,
-  PLAYER_X,
+  PLAYER_ORIGINAL_X,
   MAX_JUMP_FORCE,
   OBSTACLE_SPEED,
   GAME_WIDTH,
@@ -113,7 +113,7 @@ const GameCanvas = () => {
       </pixiContainer>
 
       {/* 玩家角色 */}
-      <pixiContainer x={PLAYER_X} y={playerY}>
+      <pixiContainer x={PLAYER_ORIGINAL_X} y={playerY}>
         <RollingBotSprite />
       </pixiContainer>
 

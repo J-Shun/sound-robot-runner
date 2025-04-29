@@ -1,12 +1,7 @@
 import { Assets, Texture, Graphics, AnimatedSprite } from 'pixi.js';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useMicrophoneVolume } from '../hooks/useMicrophoneVolume';
-import {
-  PLAYER_WIDTH,
-  PLAYER_HEIGHT,
-  PLAYER_X,
-  PLAYER_ORIGINAL_Y,
-} from '../constants/config';
+import { PLAYER_WIDTH, PLAYER_HEIGHT } from '../constants/config';
 
 import rollingBot1 from '../assets/robot/rolling-bot-body-1.png?url';
 import rollingBot2 from '../assets/robot/rolling-bot-body-2.png?url';
@@ -53,32 +48,6 @@ export function RollingBotSprite() {
     robotTextures.length > 0 &&
     busterBlueTextures.length > 0 &&
     busterBlueFullTexture !== null;
-
-  // 計算滑鼠與手砲的旋轉角度
-  const handleMouseMove = (event: MouseEvent) => {
-    if (busterRef.current) {
-      const busterSprite = busterRef.current;
-      const mouseX = event.clientX;
-      const mouseY = event.clientY;
-
-      // 計算手砲與滑鼠的相對位置
-      const deltaX = mouseX - busterSprite.x - PLAYER_X; // 減去機器人的 X 位置
-      const deltaY = mouseY - busterSprite.y - PLAYER_ORIGINAL_Y; // 減去機器人的 Y 位置
-
-      // 計算滑鼠和手砲之間的角度
-      const angle = Math.atan2(deltaY, deltaX);
-
-      // 設定手砲的旋轉角度
-      busterSprite.rotation = angle;
-    }
-  };
-  // 監聽滑鼠移動
-  useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, []);
 
   // 透過 volume 為手砲累積能量
   useEffect(() => {

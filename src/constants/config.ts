@@ -7,7 +7,7 @@ const MAX_JUMP_FORCE = 20; // 最大跳躍力道
 
 const PLAYER_WIDTH = 87; // 角色寬度
 const PLAYER_HEIGHT = 90; // 角色高度
-const PLAYER_X = 200; // 角色 X 軸位置，因為角色從左上角開始，所以需要加上寬度的一半
+const PLAYER_ORIGINAL_X = 200; // 角色 X 軸位置，因為角色從左上角開始，所以需要加上寬度的一半
 const PLAYER_ORIGINAL_Y = Math.floor(GROUND_Y - PLAYER_HEIGHT); // 角色原始 Y 軸位置（角色頭上方的水平座標）
 
 const PATROL_BOT_WIDTH = 78; // 巡邏機器人寬度
@@ -25,7 +25,7 @@ export {
   GAME_HEIGHT,
   PLAYER_WIDTH,
   PLAYER_HEIGHT,
-  PLAYER_X,
+  PLAYER_ORIGINAL_X,
   PLAYER_ORIGINAL_Y,
   PATROL_BOT_WIDTH,
   PATROL_BOT_HEIGHT,
