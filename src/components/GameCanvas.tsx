@@ -15,6 +15,8 @@ import {
   PLAYER_ORIGINAL_Y,
   PATROL_BOT_Y,
   PLAYER_SPEED,
+  FLAME_ORIGINAL_X,
+  FLAME_ORIGINAL_Y,
 } from '../constants';
 
 const GameCanvas = () => {
@@ -22,6 +24,7 @@ const GameCanvas = () => {
   const [score, setScore] = useState(0); // 分數
 
   const playerRef = useRef<Container>(null);
+  const flameRef = useRef<Container>(null);
   const patrolBotRef = useRef<Container>(null);
 
   const isLeftKeyDown = useRef(false);
@@ -81,25 +84,29 @@ const GameCanvas = () => {
       }
 
       const player = playerRef.current;
-
+      const flame = flameRef.current;
       const patrolBot = patrolBotRef.current;
 
-      if (player) {
+      if (player && flame) {
         // 左右移動
         if (isLeftKeyDown.current && player.x > 0) {
           player.x -= PLAYER_SPEED;
+          flame.x -= PLAYER_SPEED;
         }
         if (isRightKeyDown.current && player.x < GAME_WIDTH - player.width) {
           player.x += PLAYER_SPEED;
+          flame.x += PLAYER_SPEED;
         }
 
         // 跳躍
         velocityRef.current += GRAVITY;
         player.y += velocityRef.current;
+        flame.y += velocityRef.current;
 
-        // 當角色位置比地面低時，則將角色位置設置為地面位置
+        // 當角色位置比地面低時，則將角色重置
         if (player.y > PLAYER_ORIGINAL_Y) {
           player.y = PLAYER_ORIGINAL_Y;
+          flame.y = FLAME_ORIGINAL_Y;
           velocityRef.current = 0;
         }
       }
@@ -165,6 +172,16 @@ const GameCanvas = () => {
         y={PLAYER_ORIGINAL_Y}
       >
         <RollingBotSprite />
+      </pixiContainer>
+      {/* 火焰效果 */}
+      <pixiContainer ref={flameRef} x={FLAME_ORIGINAL_X} y={FLAME_ORIGINAL_Y}>
+        <pixiGraphics
+          draw={(graphics) => {
+            graphics.clear(); // 確保重繪時不會堆疊
+            graphics.rect(0, 0, 80, 15);
+            graphics.stroke({ color: '#ff0000', width: 1 });
+          }}
+        />
       </pixiContainer>
 
       {/* 敵人 */}

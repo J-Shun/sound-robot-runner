@@ -1,5 +1,5 @@
-import { Assets, Texture, Graphics, AnimatedSprite } from 'pixi.js';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { Assets, Texture, AnimatedSprite } from 'pixi.js';
+import { useEffect, useRef, useState } from 'react';
 import { useMicrophoneVolume } from '../hooks/useMicrophoneVolume';
 import { PLAYER_WIDTH, PLAYER_HEIGHT } from '../constants/config';
 
@@ -92,16 +92,6 @@ export function RollingBotSprite() {
     };
   }, [volume, isLoaded, busterBlueTextures, busterBlueFullTexture]);
 
-  // 在圖片載入後決定 hitBox 尺寸
-  const drawHitBox = useCallback((graphics: Graphics) => {
-    const width = PLAYER_WIDTH;
-    const height = PLAYER_HEIGHT;
-
-    graphics.clear(); // 確保重繪時不會堆疊
-    graphics.rect(-width / 2, -height / 2, width, height);
-    graphics.stroke({ color: '#ff0000', width: 1 });
-  }, []);
-
   // 預載圖片
   useEffect(() => {
     Promise.all(allAssetUrls.map((url) => Assets.load(url))).then(
@@ -151,8 +141,6 @@ export function RollingBotSprite() {
     <pixiContainer x={PLAYER_WIDTH / 2} y={PLAYER_HEIGHT / 2}>
       {isLoaded && (
         <>
-          {/* Hitbox 與 Sprite 為同一個 container 的子項 */}
-          <pixiGraphics draw={drawHitBox} />
           <pixiAnimatedSprite
             ref={robotRef}
             anchor={0.5}

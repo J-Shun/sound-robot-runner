@@ -1,5 +1,5 @@
-import { Assets, Texture, Graphics, AnimatedSprite } from 'pixi.js';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { Assets, Texture, AnimatedSprite } from 'pixi.js';
+import { useEffect, useRef, useState } from 'react';
 import { PATROL_BOT_WIDTH, PATROL_BOT_HEIGHT } from '../constants/config';
 
 import patrolBot1 from '../assets/enemy/patrol-robot1.png?url';
@@ -12,16 +12,6 @@ export function PatrolBotSprite() {
   const [patrolBotTextures, setPatrolBotTextures] = useState<Texture[]>([]);
 
   const isLoaded = patrolBotTextures.length > 0;
-
-  // 在圖片載入後決定 hitBox 尺寸
-  const drawHitBox = useCallback((graphics: Graphics) => {
-    const width = PATROL_BOT_WIDTH;
-    const height = PATROL_BOT_HEIGHT;
-
-    graphics.clear(); // 確保重繪時不會堆疊
-    graphics.rect(-width / 2, -height / 2, width, height);
-    graphics.stroke({ color: '#ff0000', width: 1 });
-  }, []);
 
   // 預載圖片
   useEffect(() => {
@@ -53,16 +43,12 @@ export function PatrolBotSprite() {
     // 因為 anchor 設置在中心 0.5，圖片往左上角位移，所以要將 x, y 加上角色寬度和高度的一半
     <pixiContainer x={PATROL_BOT_WIDTH / 2} y={PATROL_BOT_HEIGHT / 2}>
       {isLoaded && (
-        <>
-          {/* Hitbox 與 Sprite 為同一個 container 的子項 */}
-          <pixiGraphics draw={drawHitBox} />
-          <pixiAnimatedSprite
-            ref={patrolBotRef}
-            anchor={0.5}
-            eventMode={'static'}
-            textures={patrolBotTextures}
-          />
-        </>
+        <pixiAnimatedSprite
+          ref={patrolBotRef}
+          anchor={0.5}
+          eventMode={'static'}
+          textures={patrolBotTextures}
+        />
       )}
     </pixiContainer>
   );

@@ -10,6 +10,9 @@ const PLAYER_HEIGHT = 90; // 角色高度
 const PLAYER_ORIGINAL_X = 200; // 角色 X 軸位置，因為角色從左上角開始，所以需要加上寬度的一半
 const PLAYER_ORIGINAL_Y = Math.floor(GROUND_Y - PLAYER_HEIGHT); // 角色原始 Y 軸位置（角色頭上方的水平座標）
 
+const FLAME_ORIGINAL_X = PLAYER_ORIGINAL_X + 80; // 火焰 X 軸位置
+const FLAME_ORIGINAL_Y = PLAYER_ORIGINAL_Y + 43; // 火焰 Y 軸位置
+
 const PATROL_BOT_WIDTH = 78; // 巡邏機器人寬度
 const PATROL_BOT_HEIGHT = 96; // 巡邏機器人高度
 const PATROL_BOT_Y = GROUND_Y - PATROL_BOT_HEIGHT; // 巡邏機器人 Y 軸位置
@@ -29,6 +32,8 @@ export {
   PLAYER_HEIGHT,
   PLAYER_ORIGINAL_X,
   PLAYER_ORIGINAL_Y,
+  FLAME_ORIGINAL_X,
+  FLAME_ORIGINAL_Y,
   PATROL_BOT_WIDTH,
   PATROL_BOT_HEIGHT,
   PATROL_BOT_Y,
