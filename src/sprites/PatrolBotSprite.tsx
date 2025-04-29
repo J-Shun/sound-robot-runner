@@ -2,10 +2,10 @@ import { Assets, Texture, Graphics, AnimatedSprite } from 'pixi.js';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { PATROL_BOT_WIDTH, PATROL_BOT_HEIGHT } from '../constants/config';
 
-import patroBot1 from '../assets/enemy/patrol-robot1.png?url';
+import patrolBot1 from '../assets/enemy/patrol-robot1.png?url';
 import patrolBot2 from '../assets/enemy/patrol-robot2.png?url';
 
-const allAssetUrls = [patroBot1, patrolBot2];
+const allAssetUrls = [patrolBot1, patrolBot2];
 
 export function PatrolBotSprite() {
   const patrolBotRef = useRef<AnimatedSprite | null>(null);
@@ -34,7 +34,7 @@ export function PatrolBotSprite() {
     );
   }, []);
 
-  // 機器人 & 手砲動畫循環
+  // 機器人動畫循環
   useEffect(() => {
     if (patrolBotTextures.length === 0 || !patrolBotRef.current) return;
 
@@ -51,10 +51,7 @@ export function PatrolBotSprite() {
 
   return (
     // 因為 anchor 設置在中心 0.5，圖片往左上角位移，所以要將 x, y 加上角色寬度和高度的一半
-    <pixiContainer
-      x={PATROL_BOT_WIDTH / 2 + 100}
-      y={PATROL_BOT_HEIGHT / 2}
-    >
+    <pixiContainer x={PATROL_BOT_WIDTH / 2} y={PATROL_BOT_HEIGHT / 2}>
       {isLoaded && (
         <>
           {/* Hitbox 與 Sprite 為同一個 container 的子項 */}

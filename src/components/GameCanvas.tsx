@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useMicrophoneVolume } from '../hooks/useMicrophoneVolume';
 import { Application } from '@pixi/react';
-import { Graphics } from 'pixi.js';
 import { RollingBotSprite } from '../sprites/RollingBotSprite';
 import { PatrolBotSprite } from '../sprites/PatrolBotSprite';
 import { DesertTile } from '../sprites/DesertTile';
+import { RuinBackground } from '../sprites/RuinBackground';
 import { SunsetBackground } from '../sprites/SunsetBackground';
 import {
   GRAVITY,
@@ -13,9 +13,7 @@ import {
   MAX_JUMP_FORCE,
   VOLUME_THRESHOLD,
   OBSTACLE_WIDTH,
-  OBSTACLE_HEIGHT,
   OBSTACLE_SPEED,
-  OBSTACLE_Y,
   GAME_WIDTH,
   PLAYER_ORIGINAL_Y,
   PATROL_BOT_Y,
@@ -24,33 +22,22 @@ import {
 const GameCanvas = () => {
   // 麥克風音量
   const volume = useMicrophoneVolume();
-  // 使用四捨五入法來獲取音量
-  // const roundedVolume = Math.round(volume);
-  // console.log(roundedVolume);
 
   // 狀態管理
-  const [y, setY] = useState(PLAYER_ORIGINAL_Y); // 玩家角色的 Y 軸位置
-  const [obstacleX, setObstacleX] = useState(GAME_WIDTH); // 障礙物的 X 軸位置
+  const [playerY, setPlayerY] = useState(PLAYER_ORIGINAL_Y); // 玩家的 Y 軸位置
+  const [patrolBotX, setPatrolBotX] = useState(GAME_WIDTH); // 敵人的 X 軸位置
   const [isGameOver, setIsGameOver] = useState(false); // 遊戲是否結束
-
   const [score, setScore] = useState(0); // 分數
+
   const startTimeRef = useRef<number | null>(null); // 遊戲開始時間
   const lastScoreUpdateRef = useRef<number>(0); // 上次更新時間
 
   const velocityRef = useRef(0); // 用於追蹤角色的垂直速度
 
-  // 繪製障礙物
-  const drawObstacle = useCallback((graphics: Graphics) => {
-    graphics.clear();
-    graphics.fill(0x3399ff);
-    graphics.rect(0, 0, OBSTACLE_WIDTH, OBSTACLE_HEIGHT);
-    graphics.fill();
-  }, []);
-
   // 重置遊戲狀態
   const resetGame = () => {
-    setY(PLAYER_ORIGINAL_Y);
-    setObstacleX(GAME_WIDTH);
+    setPlayerY(PLAYER_ORIGINAL_Y);
+    setPatrolBotX(GAME_WIDTH);
     velocityRef.current = 0;
     setIsGameOver(false);
 
@@ -104,7 +91,7 @@ const GameCanvas = () => {
 
       // 處理重力邏輯
       velocityRef.current += GRAVITY;
-      setY((prevY) => {
+      setPlayerY((prevY) => {
         let newY = prevY + velocityRef.current;
         // 限制角色跳的高度不會超過 300px
         if (newY < PLAYER_ORIGINAL_Y - 300) {
@@ -120,7 +107,7 @@ const GameCanvas = () => {
       });
 
       // 障礙物向左移動，如果超出畫面則重置位置
-      setObstacleX((prevX) => {
+      setPatrolBotX((prevX) => {
         const nextX = prevX - OBSTACLE_SPEED;
         return nextX < -OBSTACLE_WIDTH ? GAME_WIDTH : nextX;
       });
@@ -130,7 +117,7 @@ const GameCanvas = () => {
 
     animationFrameId = requestAnimationFrame(update);
     return () => cancelAnimationFrame(animationFrameId); // 清除動畫幀
-  }, [volume, y, obstacleX, isGameOver]);
+  }, [volume, playerY, patrolBotX, isGameOver]);
 
   return (
     <Application
@@ -139,22 +126,14 @@ const GameCanvas = () => {
       antialias
       backgroundColor={'#ccc'}
     >
-      <pixiContainer
-        x={20}
-        y={20}
-      >
-        <pixiText
-          text={`score: ${score}`}
-          style={{
-            fontSize: 16,
-            fill: '#000000',
-          }}
-        />
-      </pixiContainer>
-
       {/* 日落背景 */}
       <pixiContainer>
         <SunsetBackground />
+      </pixiContainer>
+
+      {/* 廢墟背景 */}
+      <pixiContainer>
+        <RuinBackground />
       </pixiContainer>
 
       {/* 沙漠地面 */}
@@ -163,27 +142,23 @@ const GameCanvas = () => {
       </pixiContainer>
 
       {/* 玩家角色 */}
-      <pixiContainer
-        x={PLAYER_X}
-        y={y}
-      >
+      <pixiContainer x={PLAYER_X} y={playerY}>
         <RollingBotSprite />
       </pixiContainer>
 
       {/* 敵人 */}
-      <pixiContainer
-        x={obstacleX}
-        y={PATROL_BOT_Y}
-      >
+      <pixiContainer x={patrolBotX} y={PATROL_BOT_Y}>
         <PatrolBotSprite />
       </pixiContainer>
 
-      {/* 讓它站在地面 */}
-      <pixiContainer
-        x={obstacleX}
-        y={OBSTACLE_Y}
-      >
-        <pixiGraphics draw={drawObstacle} />
+      <pixiContainer x={20} y={20}>
+        <pixiText
+          text={`score: ${score}`}
+          style={{
+            fontSize: 16,
+            fill: '#000000',
+          }}
+        />
       </pixiContainer>
     </Application>
   );

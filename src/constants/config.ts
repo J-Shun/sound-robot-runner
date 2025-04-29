@@ -20,7 +20,7 @@ const PATROL_BOT_Y = GROUND_Y - PATROL_BOT_HEIGHT; // 障礙物 Y 軸位置
 const OBSTACLE_WIDTH = 40; // 障礙物寬度
 const OBSTACLE_HEIGHT = 80; // 障礙物高度
 const OBSTACLE_Y = GROUND_Y - OBSTACLE_HEIGHT; // 障礙物 Y 軸位置
-const OBSTACLE_SPEED = 3; // 障礙物移動速度
+const OBSTACLE_SPEED = 5; // 障礙物移動速度
 
 export {
   GROUND_Y,

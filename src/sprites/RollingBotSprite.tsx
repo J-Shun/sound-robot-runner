@@ -11,25 +11,25 @@ import {
 import rollingBot1 from '../assets/robot/rolling-bot-body-1.png?url';
 import rollingBot2 from '../assets/robot/rolling-bot-body-2.png?url';
 import robotBuster from '../assets/robot/robot-buster.png?url';
-import robotBuserBlue1 from '../assets/robot/robot-buster-blue-1.png?url';
-import robotBuserBlue2 from '../assets/robot/robot-buster-blue-2.png?url';
-import robotBuserBlue3 from '../assets/robot/robot-buster-blue-3.png?url';
-import robotBuserBlue4 from '../assets/robot/robot-buster-blue-4.png?url';
-import robotBuserBlue5 from '../assets/robot/robot-buster-blue-5.png?url';
-import robotBuserBlue6 from '../assets/robot/robot-buster-blue-6.png?url';
-import robotBuserBlueFull from '../assets/robot/robot-buster-blue-full.png?url';
+import robotBusterBlue1 from '../assets/robot/robot-buster-blue-1.png?url';
+import robotBusterBlue2 from '../assets/robot/robot-buster-blue-2.png?url';
+import robotBusterBlue3 from '../assets/robot/robot-buster-blue-3.png?url';
+import robotBusterBlue4 from '../assets/robot/robot-buster-blue-4.png?url';
+import robotBusterBlue5 from '../assets/robot/robot-buster-blue-5.png?url';
+import robotBusterBlue6 from '../assets/robot/robot-buster-blue-6.png?url';
+import robotBusterBlueFull from '../assets/robot/robot-buster-blue-full.png?url';
 
 const allAssetUrls = [
   rollingBot1,
   rollingBot2,
   robotBuster,
-  robotBuserBlue1,
-  robotBuserBlue2,
-  robotBuserBlue3,
-  robotBuserBlue4,
-  robotBuserBlue5,
-  robotBuserBlue6,
-  robotBuserBlueFull,
+  robotBusterBlue1,
+  robotBusterBlue2,
+  robotBusterBlue3,
+  robotBusterBlue4,
+  robotBusterBlue5,
+  robotBusterBlue6,
+  robotBusterBlueFull,
 ];
 
 export function RollingBotSprite() {
@@ -179,10 +179,7 @@ export function RollingBotSprite() {
 
   return (
     // 因為 anchor 設置在中心 0.5，圖片往左上角位移，所以要將 x, y 加上角色寬度和高度的一半
-    <pixiContainer
-      x={PLAYER_WIDTH / 2}
-      y={PLAYER_HEIGHT / 2}
-    >
+    <pixiContainer x={PLAYER_WIDTH / 2} y={PLAYER_HEIGHT / 2}>
       {isLoaded && (
         <>
           {/* Hitbox 與 Sprite 為同一個 container 的子項 */}
