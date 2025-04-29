@@ -32,8 +32,7 @@ const GameCanvas = () => {
       // 只有站在地上才能使用空白鍵跳躍
       if (event.code !== 'Space' || !playerRef.current) return;
       if (playerRef.current.y !== PLAYER_ORIGINAL_Y) return;
-      const jumpForce = Math.min(MAX_JUMP_FORCE);
-      velocityRef.current = -jumpForce;
+      velocityRef.current = -MAX_JUMP_FORCE;
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -62,6 +61,7 @@ const GameCanvas = () => {
       }
 
       const player = playerRef.current;
+
       const patrolBot = patrolBotRef.current;
 
       if (player) {
@@ -69,11 +69,7 @@ const GameCanvas = () => {
         velocityRef.current += GRAVITY;
         player.y += velocityRef.current;
 
-        if (player.y < PLAYER_ORIGINAL_Y - 300) {
-          player.y = PLAYER_ORIGINAL_Y - 300;
-          velocityRef.current = 0;
-        }
-
+        // 當角色位置比地面低時，則將角色位置設置為地面位置
         if (player.y > PLAYER_ORIGINAL_Y) {
           player.y = PLAYER_ORIGINAL_Y;
           velocityRef.current = 0;
