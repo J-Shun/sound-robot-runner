@@ -10,8 +10,17 @@ const PLAYER_HEIGHT = 90; // 角色高度
 const PLAYER_ORIGINAL_X = 200; // 角色 X 軸位置，因為角色從左上角開始，所以需要加上寬度的一半
 const PLAYER_ORIGINAL_Y = Math.floor(GROUND_Y - PLAYER_HEIGHT); // 角色原始 Y 軸位置（角色頭上方的水平座標）
 
+const FLAME_GUN_ORIGINAL_X = PLAYER_ORIGINAL_X + 44; // 火焰槍 X 軸位置
+const FLAME_GUN_ORIGINAL_Y = PLAYER_ORIGINAL_Y + 45; // 火焰槍 Y 軸位置
+
 const FLAME_ORIGINAL_X = PLAYER_ORIGINAL_X + 80; // 火焰 X 軸位置
 const FLAME_ORIGINAL_Y = PLAYER_ORIGINAL_Y + 43; // 火焰 Y 軸位置
+
+// 火焰充能的時間閾值
+const FLAME_CHARGE_TIME_S = 105; // 進化到小火焰的充能時間
+const FLAME_CHARGE_TIME_M = 210; // 進化到中火焰的充能時間
+const FLAME_CHARGE_TIME_L = 315; // 進化到大火焰的充能時間
+const FLAME_CHARGE_TIME_L_MAX = 500; // 充能極限
 
 const FLAME_WIDTH_S = 45; // 小型火焰寬度
 const FLAME_WIDTH_M = 144; // 中型火焰寬度
@@ -46,4 +55,10 @@ export {
   FLAME_WIDTH_M,
   FLAME_WIDTH_L,
   FLAME_HEIGHT,
+  FLAME_GUN_ORIGINAL_X,
+  FLAME_GUN_ORIGINAL_Y,
+  FLAME_CHARGE_TIME_S,
+  FLAME_CHARGE_TIME_M,
+  FLAME_CHARGE_TIME_L,
+  FLAME_CHARGE_TIME_L_MAX,
 };

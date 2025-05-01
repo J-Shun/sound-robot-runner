@@ -1,118 +1,24 @@
 import { Assets, Texture, AnimatedSprite } from 'pixi.js';
 import { useEffect, useRef, useState } from 'react';
-import { useMicrophoneVolume } from '../hooks/useMicrophoneVolume';
 import { PLAYER_WIDTH, PLAYER_HEIGHT } from '../constants/config';
 
 import rollingBot1 from '../assets/robot/rolling-bot-body-1.png?url';
 import rollingBot2 from '../assets/robot/rolling-bot-body-2.png?url';
-import robotBuster from '../assets/robot/robot-buster.png?url';
-import robotBuster1 from '../assets/robot/robot-buster-red-1.png?url';
-import robotBuster2 from '../assets/robot/robot-buster-red-2.png?url';
-import robotBuster3 from '../assets/robot/robot-buster-red-3.png?url';
-import robotBuster4 from '../assets/robot/robot-buster-red-4.png?url';
-import robotBuster5 from '../assets/robot/robot-buster-red-5.png?url';
-import robotBuster6 from '../assets/robot/robot-buster-red-6.png?url';
-import robotBusterFull from '../assets/robot/robot-buster-blue-full.png?url';
 
-const allAssetUrls = [
-  rollingBot1,
-  rollingBot2,
-  robotBuster,
-  robotBuster1,
-  robotBuster2,
-  robotBuster3,
-  robotBuster4,
-  robotBuster5,
-  robotBuster6,
-  robotBusterFull,
-];
+const allAssetUrls = [rollingBot1, rollingBot2];
 
 export function RollingBotSprite() {
   const robotRef = useRef<AnimatedSprite | null>(null);
-  const busterRef = useRef<AnimatedSprite | null>(null);
   const [robotTextures, setRobotTextures] = useState<Texture[]>([]);
-  const [busterDefaultTextures, setBusterDefaultTextures] = useState<Texture[]>(
-    []
-  );
-  const [busterTextures, setBusterTextures] = useState<Texture[]>([]);
-  const [busterFullTexture, setBusterFullTexture] = useState<Texture | null>(
-    null
-  );
 
-  const chargeTimeRef = useRef(0);
-  // 判斷進入哪個集氣的哪個階段
-  const phaseRef = useRef(0);
-
-  const volume = useMicrophoneVolume();
-
-  const isLoaded =
-    robotTextures.length > 0 &&
-    busterTextures.length > 0 &&
-    busterFullTexture !== null;
-
-  // 透過 volume 為手砲累積能量
-  useEffect(() => {
-    if (!isLoaded || !busterRef.current) return;
-
-    let animationFrameId: number;
-
-    const update = () => {
-      const sprite = busterRef.current;
-      if (!sprite) return;
-
-      if (chargeTimeRef.current > 105 && phaseRef.current === 0) {
-        sprite.textures = [busterTextures[0], busterTextures[1]];
-        sprite.animationSpeed = 0.2;
-        sprite.play();
-        phaseRef.current = 1;
-      } else if (chargeTimeRef.current > 210 && phaseRef.current === 1) {
-        sprite.textures = [busterTextures[2], busterTextures[3]];
-        sprite.animationSpeed = 0.2;
-        sprite.play();
-        phaseRef.current = 2;
-      } else if (chargeTimeRef.current > 315 && phaseRef.current === 2) {
-        sprite.textures = [busterTextures[4], busterTextures[5]];
-        sprite.animationSpeed = 0.2;
-        sprite.play();
-        phaseRef.current = 3;
-      }
-      // 聲音大於 2 時，才算是開始充能，才能開始累積補充時間
-      // 大於 4 時，速度加快
-      if (volume > 2) {
-        chargeTimeRef.current += 1; // 每 1/60 秒增加 1
-      } else if (volume > 4) {
-        chargeTimeRef.current += 1.1;
-      }
-      animationFrameId = requestAnimationFrame(update);
-    };
-
-    update();
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [volume, isLoaded, busterTextures, busterFullTexture]);
+  const isLoaded = robotTextures.length > 0;
 
   // 預載圖片
   useEffect(() => {
     Promise.all(allAssetUrls.map((url) => Assets.load(url))).then(
       (textures) => {
         const robot = [textures[0], textures[1]];
-        const busterDefault = [textures[2]];
-        const busterBlue = [
-          textures[3],
-          textures[4],
-          textures[5],
-          textures[6],
-          textures[7],
-          textures[8],
-        ];
-        const busterBlueFull = textures[9];
-
         setRobotTextures(robot);
-        setBusterDefaultTextures(busterDefault);
-        setBusterTextures(busterBlue);
-        setBusterFullTexture(busterBlueFull);
       }
     );
   }, []);
@@ -120,26 +26,24 @@ export function RollingBotSprite() {
   // 機器人 & 手砲動畫循環
   useEffect(() => {
     if (robotTextures.length === 0 || !robotRef.current) return;
-    if (busterDefaultTextures.length === 0 || !busterRef.current) return;
 
     const robotSprite = robotRef.current;
     robotSprite.textures = robotTextures;
     robotSprite.animationSpeed = 0.1; // 動畫速度
     robotSprite.play(); // 開始播放動畫
 
-    const busterSprite = busterRef.current;
-    busterSprite.textures = [busterDefaultTextures[0]];
-
     // 停止動畫
     return () => {
       robotSprite.stop();
-      busterSprite.stop();
     };
-  }, [robotTextures, busterDefaultTextures]);
+  }, [robotTextures]);
 
   return (
     // 因為 anchor 設置在中心 0.5，圖片往左上角位移，所以要將 x, y 加上角色寬度和高度的一半
-    <pixiContainer x={PLAYER_WIDTH / 2} y={PLAYER_HEIGHT / 2}>
+    <pixiContainer
+      x={PLAYER_WIDTH / 2}
+      y={PLAYER_HEIGHT / 2}
+    >
       {isLoaded && (
         <>
           <pixiAnimatedSprite
@@ -147,14 +51,6 @@ export function RollingBotSprite() {
             anchor={0.5}
             eventMode={'static'}
             textures={robotTextures}
-          />
-          <pixiAnimatedSprite
-            ref={busterRef}
-            anchor={0.5}
-            x={4}
-            y={6}
-            eventMode={'static'}
-            textures={busterTextures}
           />
         </>
       )}

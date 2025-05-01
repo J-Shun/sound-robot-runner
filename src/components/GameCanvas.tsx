@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Application } from '@pixi/react';
 import { Container } from 'pixi.js';
 import { RollingBotSprite } from '../sprites/RollingBotSprite';
+import { FlameGun } from '../sprites/FlameGun';
 import { PatrolBotSprite } from '../sprites/PatrolBotSprite';
 import { DesertTile } from '../sprites/DesertTile';
 import { RuinBackground } from '../sprites/RuinBackground';
@@ -15,16 +16,16 @@ import {
   PLAYER_ORIGINAL_Y,
   PATROL_BOT_Y,
   PLAYER_SPEED,
-  FLAME_ORIGINAL_X,
-  FLAME_ORIGINAL_Y,
+  FLAME_GUN_ORIGINAL_X,
+  FLAME_GUN_ORIGINAL_Y,
 } from '../constants';
 
 const GameCanvas = () => {
   // 狀態管理
   const [score, setScore] = useState(0); // 分數
 
-  const playerRef = useRef<Container>(null);
-  const flameRef = useRef<Container>(null);
+  const robotRef = useRef<Container>(null);
+  const flameGunRef = useRef<Container>(null);
   const patrolBotRef = useRef<Container>(null);
 
   const isLeftKeyDown = useRef(false);
@@ -42,7 +43,7 @@ const GameCanvas = () => {
         isRightKeyDown.current = true;
       } else if (
         event.code === 'Space' &&
-        playerRef.current?.y === PLAYER_ORIGINAL_Y
+        robotRef.current?.y === PLAYER_ORIGINAL_Y
       ) {
         velocityRef.current = -MAX_JUMP_FORCE;
       }
@@ -83,30 +84,30 @@ const GameCanvas = () => {
         lastScoreUpdateRef.current = now;
       }
 
-      const player = playerRef.current;
-      const flame = flameRef.current;
+      const player = robotRef.current;
+      const flameGun = flameGunRef.current;
       const patrolBot = patrolBotRef.current;
 
-      if (player && flame) {
+      if (player && flameGun) {
         // 左右移動
         if (isLeftKeyDown.current && player.x > 0) {
           player.x -= PLAYER_SPEED;
-          flame.x -= PLAYER_SPEED;
+          flameGun.x -= PLAYER_SPEED;
         }
         if (isRightKeyDown.current && player.x < GAME_WIDTH - player.width) {
           player.x += PLAYER_SPEED;
-          flame.x += PLAYER_SPEED;
+          flameGun.x += PLAYER_SPEED;
         }
 
         // 跳躍
         velocityRef.current += GRAVITY;
         player.y += velocityRef.current;
-        flame.y += velocityRef.current;
+        flameGun.y += velocityRef.current;
 
         // 當角色位置比地面低時，則將角色重置
         if (player.y > PLAYER_ORIGINAL_Y) {
           player.y = PLAYER_ORIGINAL_Y;
-          flame.y = FLAME_ORIGINAL_Y;
+          flameGun.y = FLAME_GUN_ORIGINAL_Y;
           velocityRef.current = 0;
         }
       }
@@ -167,30 +168,35 @@ const GameCanvas = () => {
 
       {/* 玩家角色 */}
       <pixiContainer
-        ref={playerRef}
+        ref={robotRef}
         x={PLAYER_ORIGINAL_X}
         y={PLAYER_ORIGINAL_Y}
       >
         <RollingBotSprite />
       </pixiContainer>
-      {/* 火焰效果 */}
-      <pixiContainer ref={flameRef} x={FLAME_ORIGINAL_X} y={FLAME_ORIGINAL_Y}>
-        <pixiGraphics
-          draw={(graphics) => {
-            graphics.clear(); // 確保重繪時不會堆疊
-            graphics.rect(0, 0, 80, 15);
-            graphics.stroke({ color: '#ff0000', width: 1 });
-          }}
-        />
+      {/* 火焰槍 */}
+      <pixiContainer
+        ref={flameGunRef}
+        x={FLAME_GUN_ORIGINAL_X}
+        y={FLAME_GUN_ORIGINAL_Y}
+      >
+        <FlameGun />
       </pixiContainer>
 
       {/* 敵人 */}
-      <pixiContainer ref={patrolBotRef} x={GAME_WIDTH} y={PATROL_BOT_Y}>
+      <pixiContainer
+        ref={patrolBotRef}
+        x={GAME_WIDTH}
+        y={PATROL_BOT_Y}
+      >
         <PatrolBotSprite />
       </pixiContainer>
 
       {/* 計分器 */}
-      <pixiContainer x={20} y={20}>
+      <pixiContainer
+        x={20}
+        y={20}
+      >
         <pixiText
           text={`score: ${score}`}
           style={{
