@@ -6,25 +6,25 @@ import { PLAYER_WIDTH, PLAYER_HEIGHT } from '../constants/config';
 import rollingBot1 from '../assets/robot/rolling-bot-body-1.png?url';
 import rollingBot2 from '../assets/robot/rolling-bot-body-2.png?url';
 import robotBuster from '../assets/robot/robot-buster.png?url';
-import robotBusterBlue1 from '../assets/robot/robot-buster-blue-1.png?url';
-import robotBusterBlue2 from '../assets/robot/robot-buster-blue-2.png?url';
-import robotBusterBlue3 from '../assets/robot/robot-buster-blue-3.png?url';
-import robotBusterBlue4 from '../assets/robot/robot-buster-blue-4.png?url';
-import robotBusterBlue5 from '../assets/robot/robot-buster-blue-5.png?url';
-import robotBusterBlue6 from '../assets/robot/robot-buster-blue-6.png?url';
-import robotBusterBlueFull from '../assets/robot/robot-buster-blue-full.png?url';
+import robotBuster1 from '../assets/robot/robot-buster-red-1.png?url';
+import robotBuster2 from '../assets/robot/robot-buster-red-2.png?url';
+import robotBuster3 from '../assets/robot/robot-buster-red-3.png?url';
+import robotBuster4 from '../assets/robot/robot-buster-red-4.png?url';
+import robotBuster5 from '../assets/robot/robot-buster-red-5.png?url';
+import robotBuster6 from '../assets/robot/robot-buster-red-6.png?url';
+import robotBusterFull from '../assets/robot/robot-buster-blue-full.png?url';
 
 const allAssetUrls = [
   rollingBot1,
   rollingBot2,
   robotBuster,
-  robotBusterBlue1,
-  robotBusterBlue2,
-  robotBusterBlue3,
-  robotBusterBlue4,
-  robotBusterBlue5,
-  robotBusterBlue6,
-  robotBusterBlueFull,
+  robotBuster1,
+  robotBuster2,
+  robotBuster3,
+  robotBuster4,
+  robotBuster5,
+  robotBuster6,
+  robotBusterFull,
 ];
 
 export function RollingBotSprite() {
@@ -34,9 +34,10 @@ export function RollingBotSprite() {
   const [busterDefaultTextures, setBusterDefaultTextures] = useState<Texture[]>(
     []
   );
-  const [busterBlueTextures, setBusterBlueTextures] = useState<Texture[]>([]);
-  const [busterBlueFullTexture, setBusterBlueFullTexture] =
-    useState<Texture | null>(null);
+  const [busterTextures, setBusterTextures] = useState<Texture[]>([]);
+  const [busterFullTexture, setBusterFullTexture] = useState<Texture | null>(
+    null
+  );
 
   const chargeTimeRef = useRef(0);
   // 判斷進入哪個集氣的哪個階段
@@ -46,8 +47,8 @@ export function RollingBotSprite() {
 
   const isLoaded =
     robotTextures.length > 0 &&
-    busterBlueTextures.length > 0 &&
-    busterBlueFullTexture !== null;
+    busterTextures.length > 0 &&
+    busterFullTexture !== null;
 
   // 透過 volume 為手砲累積能量
   useEffect(() => {
@@ -60,17 +61,17 @@ export function RollingBotSprite() {
       if (!sprite) return;
 
       if (chargeTimeRef.current > 105 && phaseRef.current === 0) {
-        sprite.textures = [busterBlueTextures[0], busterBlueTextures[1]];
+        sprite.textures = [busterTextures[0], busterTextures[1]];
         sprite.animationSpeed = 0.2;
         sprite.play();
         phaseRef.current = 1;
       } else if (chargeTimeRef.current > 210 && phaseRef.current === 1) {
-        sprite.textures = [busterBlueTextures[2], busterBlueTextures[3]];
+        sprite.textures = [busterTextures[2], busterTextures[3]];
         sprite.animationSpeed = 0.2;
         sprite.play();
         phaseRef.current = 2;
       } else if (chargeTimeRef.current > 315 && phaseRef.current === 2) {
-        sprite.textures = [busterBlueTextures[4], busterBlueTextures[5]];
+        sprite.textures = [busterTextures[4], busterTextures[5]];
         sprite.animationSpeed = 0.2;
         sprite.play();
         phaseRef.current = 3;
@@ -90,7 +91,7 @@ export function RollingBotSprite() {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [volume, isLoaded, busterBlueTextures, busterBlueFullTexture]);
+  }, [volume, isLoaded, busterTextures, busterFullTexture]);
 
   // 預載圖片
   useEffect(() => {
@@ -110,8 +111,8 @@ export function RollingBotSprite() {
 
         setRobotTextures(robot);
         setBusterDefaultTextures(busterDefault);
-        setBusterBlueTextures(busterBlue);
-        setBusterBlueFullTexture(busterBlueFull);
+        setBusterTextures(busterBlue);
+        setBusterFullTexture(busterBlueFull);
       }
     );
   }, []);
@@ -153,7 +154,7 @@ export function RollingBotSprite() {
             x={4}
             y={6}
             eventMode={'static'}
-            textures={busterBlueTextures}
+            textures={busterTextures}
           />
         </>
       )}
