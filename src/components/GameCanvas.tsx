@@ -18,6 +18,7 @@ import {
   PLAYER_SPEED,
   FLAME_GUN_ORIGINAL_X,
   FLAME_GUN_ORIGINAL_Y,
+  FLAME_GUN_WIDTH,
 } from '../constants';
 
 const GameCanvas = () => {
@@ -133,7 +134,24 @@ const GameCanvas = () => {
           playerBounds.y < patrolBotBounds.y + patrolBotBounds.height;
 
         if (isHit) {
-          console.log('hit');
+          console.log('hurt');
+        }
+      }
+
+      // 攻擊到敵人判定
+      if (flameGun && patrolBot) {
+        const flameGunBounds = flameGun.getBounds();
+        const patrolBotBounds = patrolBot.getBounds();
+
+        const isHit =
+          flameGunBounds.x + flameGunBounds.width > patrolBotBounds.x &&
+          flameGunBounds.x < patrolBotBounds.x + patrolBotBounds.width &&
+          flameGunBounds.y + flameGunBounds.height > patrolBotBounds.y &&
+          flameGunBounds.y < patrolBotBounds.y + patrolBotBounds.height &&
+          flameGunBounds.width > FLAME_GUN_WIDTH;
+
+        if (isHit) {
+          console.log('attack');
         }
       }
 

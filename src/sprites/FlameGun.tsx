@@ -107,7 +107,7 @@ export function FlameGun() {
         if (phase === 0) {
           flameGunSprite.textures = [flameGunChargeTextures[0]];
           flameGunSprite.stop();
-          effectSprite.alpha = 0; // 沒有攻擊時火焰效果隱藏
+          effectSprite.visible = false; // 沒有攻擊時火焰效果隱藏
         } else if (phase === 1) {
           flameGunSprite.textures = [
             flameGunChargeTextures[1],
@@ -118,8 +118,8 @@ export function FlameGun() {
 
           effectSprite.textures = [effectTextures[0], effectTextures[1]];
           effectSprite.animationSpeed = 0.2;
+          effectSprite.visible = true;
           effectSprite.play();
-          effectSprite.alpha = 1;
         } else if (phase === 2) {
           flameGunSprite.textures = [
             flameGunChargeTextures[3],
@@ -130,8 +130,8 @@ export function FlameGun() {
 
           effectSprite.textures = [effectTextures[2], effectTextures[3]];
           effectSprite.animationSpeed = 0.2;
+          effectSprite.visible = true;
           effectSprite.play();
-          effectSprite.alpha = 1;
         } else if (phase === 3) {
           flameGunSprite.textures = [
             flameGunChargeTextures[5],
@@ -142,8 +142,8 @@ export function FlameGun() {
 
           effectSprite.textures = [effectTextures[4], effectTextures[5]];
           effectSprite.animationSpeed = 0.2;
+          effectSprite.visible = true;
           effectSprite.play();
-          effectSprite.alpha = 1;
         }
       }
       animationFrameId = requestAnimationFrame(update);
@@ -161,10 +161,7 @@ export function FlameGun() {
     Promise.all(gun.map((url) => Assets.load(url))).then((textures) => {
       setFlameGunChargeTextures(textures);
     });
-  }, []);
 
-  // 預載圖片 effect
-  useEffect(() => {
     Promise.all(effect.map((url) => Assets.load(url))).then((textures) => {
       setEffectTextures(textures);
     });
@@ -179,7 +176,7 @@ export function FlameGun() {
     flameGunSprite.textures = [flameGunChargeTextures[0]];
 
     const effectSprite = effctRef.current;
-    effectSprite.alpha = 0;
+    effectSprite.visible = false;
 
     // 停止動畫
     return () => {
