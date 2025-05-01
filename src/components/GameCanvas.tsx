@@ -36,6 +36,39 @@ const GameCanvas = () => {
   const lastScoreUpdateRef = useRef<number>(0); // 上次更新時間
   const velocityRef = useRef<number>(0); // 用於追蹤角色的垂直速度
 
+  // 角色無敵幀相關
+  const playerLastHitTimeRef = useRef<number>(0);
+  const patrolBotLastHitTimeRef = useRef<number>(0);
+  const playerInvincibleRef = useRef(false);
+  const patrolBotInvincibleRef = useRef(false);
+
+  // 無敵狀態處理
+  const startInvincibility = (
+    sprite: Container,
+    invincibleRef: React.RefObject<boolean>
+  ) => {
+    invincibleRef.current = true;
+    let elapsed = 0;
+    const flickerInterval = 50; // 每50ms閃爍一次
+    const totalDuration = 100; // 無敵持續時間 100ms
+
+    const flicker = () => {
+      if (sprite) {
+        sprite.tint = sprite.tint === 0xffffff ? 0xff0000 : 0xffffff; // 紅色和白色之間切換
+      }
+    };
+
+    const intervalId = setInterval(() => {
+      flicker();
+      elapsed += flickerInterval;
+      if (elapsed >= totalDuration) {
+        clearInterval(intervalId);
+        sprite.tint = 0xffffff; // 恢復顏色
+        invincibleRef.current = false;
+      }
+    }, flickerInterval);
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === 'ArrowLeft') {
@@ -89,69 +122,79 @@ const GameCanvas = () => {
       const flameGun = flameGunRef.current;
       const patrolBot = patrolBotRef.current;
 
-      if (player && flameGun) {
-        // 左右移動
+      // 碰撞判斷
+      if (player && patrolBot && flameGun) {
+        // 玩家左右移動
         if (isLeftKeyDown.current && player.x > 0) {
           player.x -= PLAYER_SPEED;
           flameGun.x -= PLAYER_SPEED;
         }
+
         if (isRightKeyDown.current && player.x < GAME_WIDTH - player.width) {
           player.x += PLAYER_SPEED;
           flameGun.x += PLAYER_SPEED;
         }
 
-        // 跳躍
+        // 玩家跳躍
         velocityRef.current += GRAVITY;
         player.y += velocityRef.current;
         flameGun.y += velocityRef.current;
 
-        // 當角色位置比地面低時，則將角色重置
+        // 當玩家位置比地面低時，則將玩家重置
         if (player.y > PLAYER_ORIGINAL_Y) {
           player.y = PLAYER_ORIGINAL_Y;
           flameGun.y = FLAME_GUN_ORIGINAL_Y;
           velocityRef.current = 0;
         }
-      }
 
-      // 巡邏機器人向左移動，如果超出畫面則重置位置
-      if (patrolBot) {
-        // 更新敵人位置（巡邏）
+        // 更新巡邏機器人位置
         patrolBot.x -= SPEED;
         if (patrolBot.x < -patrolBot.width) {
           patrolBot.x = GAME_WIDTH;
         }
-      }
 
-      // 碰撞判斷
-      if (player && patrolBot) {
         const playerBounds = player.getBounds();
         const patrolBotBounds = patrolBot.getBounds();
+        const flameGunBounds = flameGun.getBounds();
 
-        const isHit =
+        const isPlayerGetHit =
           playerBounds.x + playerBounds.width > patrolBotBounds.x &&
           playerBounds.x < patrolBotBounds.x + patrolBotBounds.width &&
           playerBounds.y + playerBounds.height > patrolBotBounds.y &&
           playerBounds.y < patrolBotBounds.y + patrolBotBounds.height;
 
-        if (isHit) {
-          console.log('hurt');
-        }
-      }
-
-      // 攻擊到敵人判定
-      if (flameGun && patrolBot) {
-        const flameGunBounds = flameGun.getBounds();
-        const patrolBotBounds = patrolBot.getBounds();
-
-        const isHit =
+        const isPatrolBotGetHit =
           flameGunBounds.x + flameGunBounds.width > patrolBotBounds.x &&
           flameGunBounds.x < patrolBotBounds.x + patrolBotBounds.width &&
           flameGunBounds.y + flameGunBounds.height > patrolBotBounds.y &&
           flameGunBounds.y < patrolBotBounds.y + patrolBotBounds.height &&
           flameGunBounds.width > FLAME_GUN_WIDTH;
 
-        if (isHit) {
-          console.log('attack');
+        const currentTime = now;
+        if (
+          isPlayerGetHit &&
+          currentTime - playerLastHitTimeRef.current > 100 &&
+          !playerInvincibleRef.current
+        ) {
+          // 玩家後退
+          player.x -= 16;
+          flameGun.x -= 16;
+          // 更新玩家最後被擊中的時間
+          playerLastHitTimeRef.current = currentTime;
+          startInvincibility(player, playerInvincibleRef);
+          startInvincibility(flameGun, playerInvincibleRef);
+        }
+
+        if (
+          isPatrolBotGetHit &&
+          currentTime - patrolBotLastHitTimeRef.current > 100 &&
+          !patrolBotInvincibleRef.current
+        ) {
+          // 敵人後退
+          patrolBot.x += 16;
+          // 更新敵人最後被擊中的時間
+          patrolBotLastHitTimeRef.current = currentTime;
+          startInvincibility(patrolBot, patrolBotInvincibleRef);
         }
       }
 
