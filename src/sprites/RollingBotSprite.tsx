@@ -42,6 +42,8 @@ export function RollingBotSprite({ isGameOver }: { isGameOver: boolean }) {
     if (robotTextures.length === 0 || !robotRef.current) return;
     if (isGameOver) {
       robotRef.current.stop(); // 停止動畫
+    } else {
+      robotRef.current.play(); // 開始播放動畫
     }
   }, [isGameOver, robotTextures]);
 

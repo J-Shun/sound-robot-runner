@@ -39,8 +39,11 @@ export function PatrolBotSprite({ isGameOver }: { isGameOver: boolean }) {
   }, [patrolBotTextures]);
 
   useEffect(() => {
-    if (isGameOver && patrolBotRef.current) {
+    if (!patrolBotRef.current) return;
+    if (isGameOver) {
       patrolBotRef.current.stop(); // 停止動畫
+    } else {
+      patrolBotRef.current?.play(); // 播放動畫
     }
   }, [isGameOver]);
 

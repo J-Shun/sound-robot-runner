@@ -35,6 +35,7 @@ const FLAME_HEIGHT = 27; // 火焰高度
 const PATROL_BOT_WIDTH = 96; // 巡邏機器人寬度
 const PATROL_BOT_HEIGHT = 96; // 巡邏機器人高度
 const PATROL_BOT_Y = GROUND_Y - PATROL_BOT_HEIGHT; // 巡邏機器人 Y 軸位置
+const PATROL_BOT_HP = 3; // 巡邏機器人血量
 
 const PLAYER_SPEED = 4.5; // 角色移動速度
 const BACKGROUND_SPEED = 3; // 建築物移動速度
@@ -74,4 +75,5 @@ export {
   HP_BAR_X,
   HP_BAR_Y,
   BACKGROUND_SPEED,
+  PATROL_BOT_HP,
 };

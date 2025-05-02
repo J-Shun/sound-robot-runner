@@ -14,6 +14,7 @@ import {
   MAX_JUMP_FORCE,
   PATROL_BOT_SPEED,
   GAME_WIDTH,
+  GAME_HEIGHT,
   PLAYER_ORIGINAL_Y,
   PATROL_BOT_Y,
   PLAYER_SPEED,
@@ -23,6 +24,7 @@ import {
   PLAYER_HP,
   HP_BAR_X,
   HP_BAR_Y,
+  PATROL_BOT_HP,
 } from '../constants';
 
 const GameCanvas = () => {
@@ -47,8 +49,8 @@ const GameCanvas = () => {
   const playerInvincibleRef = useRef(false);
   const patrolBotInvincibleRef = useRef(false);
 
-  const playerHpRef = useRef<number>(5); // 玩家初始 5 點 HP
-  const patrolBotHpRef = useRef<number>(3); // 巡邏機器人初始 3 點 HP
+  const playerHpRef = useRef<number>(PLAYER_HP); // 玩家初始 5 點 HP
+  const patrolBotHpRef = useRef<number>(PATROL_BOT_HP); // 巡邏機器人初始 3 點 HP
 
   // 無敵狀態處理
   const startInvincibility = (
@@ -76,6 +78,39 @@ const GameCanvas = () => {
     }, flickerInterval);
   };
 
+  const resetGame = () => {
+    setIsGameOver(false);
+    setScore(0);
+
+    // 重設時間
+    startTimeRef.current = null;
+    lastScoreUpdateRef.current = 0;
+
+    // 重設角色狀態
+    velocityRef.current = 0;
+    playerHpRef.current = PLAYER_HP;
+    patrolBotHpRef.current = PATROL_BOT_HP;
+
+    playerLastHitTimeRef.current = 0;
+    patrolBotLastHitTimeRef.current = 0;
+    playerInvincibleRef.current = false;
+    patrolBotInvincibleRef.current = false;
+
+    // 重設角色位置
+    if (robotRef.current) {
+      robotRef.current.x = PLAYER_ORIGINAL_X;
+      robotRef.current.y = PLAYER_ORIGINAL_Y;
+    }
+    if (flameGunRef.current) {
+      flameGunRef.current.x = FLAME_GUN_ORIGINAL_X;
+      flameGunRef.current.y = FLAME_GUN_ORIGINAL_Y;
+    }
+    if (patrolBotRef.current) {
+      patrolBotRef.current.x = GAME_WIDTH;
+      patrolBotRef.current.y = PATROL_BOT_Y;
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === 'ArrowLeft') {
@@ -87,6 +122,11 @@ const GameCanvas = () => {
         robotRef.current?.y === PLAYER_ORIGINAL_Y
       ) {
         velocityRef.current = -MAX_JUMP_FORCE;
+      }
+
+      // 按任一鍵重置遊戲
+      if (isGameOver && event.code === 'Space') {
+        resetGame();
       }
     };
 
@@ -105,7 +145,7 @@ const GameCanvas = () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [isGameOver]);
 
   // 監聽音量變化，更新角色與障礙物位置
   useEffect(() => {
@@ -121,8 +161,7 @@ const GameCanvas = () => {
 
       // 每 0.1 秒加一分
       if (now - lastScoreUpdateRef.current > 100) {
-        const elapsed = now - startTimeRef.current;
-        setScore(Math.floor(elapsed / 100));
+        setScore((prevScore) => prevScore + 1);
         lastScoreUpdateRef.current = now;
       }
 
@@ -160,6 +199,7 @@ const GameCanvas = () => {
         patrolBot.x -= PATROL_BOT_SPEED;
         if (patrolBot.x < -patrolBot.width) {
           patrolBot.x = GAME_WIDTH;
+          patrolBotHpRef.current = PATROL_BOT_HP;
         }
 
         const playerBounds = player.getBounds();
@@ -214,6 +254,7 @@ const GameCanvas = () => {
             // HP 歸 0，敵人回到起始位置
             patrolBot.x = GAME_WIDTH;
             patrolBotHpRef.current = 3;
+            setScore((prevScore) => prevScore + 100);
           } else {
             // 更新敵人最後被擊中的時間
             patrolBotLastHitTimeRef.current = currentTime;
@@ -312,6 +353,32 @@ const GameCanvas = () => {
               graphics.rect(x, 0, width, height);
               graphics.fill({ color: color });
             }
+          }}
+        />
+      </pixiContainer>
+
+      {/* 遊戲結束 UI */}
+      <pixiContainer
+        x={GAME_WIDTH / 2}
+        y={GAME_HEIGHT / 2 - 48}
+      >
+        <pixiText
+          anchor={0.5}
+          text={isGameOver ? 'Game Over' : ''}
+          style={{
+            fontSize: 64,
+            fontWeight: 'bold',
+            fill: '#ffffff',
+          }}
+        />
+
+        <pixiText
+          anchor={0.5}
+          text={isGameOver ? 'Press space to restart' : ''}
+          y={64}
+          style={{
+            fontSize: 32,
+            fill: '#ffffff',
           }}
         />
       </pixiContainer>
