@@ -196,7 +196,13 @@ const GameCanvas = () => {
         }
 
         // 更新巡邏機器人位置
-        patrolBot.x -= PATROL_BOT_SPEED;
+        let patrolSpeed = PATROL_BOT_SPEED;
+        if (score > 1000) {
+          patrolSpeed = PATROL_BOT_SPEED * 1.6;
+        } else if (score > 2000) {
+          patrolSpeed = PATROL_BOT_SPEED * 2;
+        }
+        patrolBot.x -= patrolSpeed;
         if (patrolBot.x < -patrolBot.width) {
           patrolBot.x = GAME_WIDTH;
           patrolBotHpRef.current = PATROL_BOT_HP;
@@ -268,7 +274,7 @@ const GameCanvas = () => {
 
     animationFrameId = requestAnimationFrame(update);
     return () => cancelAnimationFrame(animationFrameId); // 清除動畫幀
-  }, [isGameOver]);
+  }, [isGameOver, score]);
 
   return (
     <Application
