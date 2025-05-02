@@ -158,7 +158,7 @@ export function FlameGun({ isGameOver }: { isGameOver: boolean }) {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [volume, isLoaded, flameGunChargeTextures, effectTextures]);
+  }, [volume, isLoaded, flameGunChargeTextures, effectTextures, isGameOver]);
 
   // 預載圖片
   useEffect(() => {

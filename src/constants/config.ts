@@ -27,11 +27,6 @@ const FLAME_CHARGE_TIME_M = 210; // 進化到中火焰的充能時間
 const FLAME_CHARGE_TIME_L = 315; // 進化到大火焰的充能時間
 const FLAME_CHARGE_TIME_L_MAX = 500; // 充能極限
 
-const FLAME_WIDTH_S = 45; // 小型火焰寬度
-const FLAME_WIDTH_M = 144; // 中型火焰寬度
-const FLAME_WIDTH_L = 192; // 大型火焰寬度
-const FLAME_HEIGHT = 27; // 火焰高度
-
 const PATROL_BOT_WIDTH = 96; // 巡邏機器人寬度
 const PATROL_BOT_HEIGHT = 96; // 巡邏機器人高度
 const PATROL_BOT_Y = GROUND_Y - PATROL_BOT_HEIGHT; // 巡邏機器人 Y 軸位置
@@ -40,13 +35,11 @@ const PATROL_BOT_HP = 3; // 巡邏機器人血量
 const PLAYER_SPEED = 4.5; // 角色移動速度
 const BACKGROUND_SPEED = 3; // 建築物移動速度
 const PATROL_BOT_SPEED = 4; // 巡邏機器人移動速度
-const SPEED = 4; // 移動速度
 
 export {
   GROUND_Y,
   GRAVITY,
   MAX_JUMP_FORCE,
-  SPEED,
   PATROL_BOT_SPEED,
   PLAYER_SPEED,
   GAME_WIDTH,
@@ -60,10 +53,6 @@ export {
   PATROL_BOT_WIDTH,
   PATROL_BOT_HEIGHT,
   PATROL_BOT_Y,
-  FLAME_WIDTH_S,
-  FLAME_WIDTH_M,
-  FLAME_WIDTH_L,
-  FLAME_HEIGHT,
   FLAME_GUN_ORIGINAL_X,
   FLAME_GUN_ORIGINAL_Y,
   FLAME_CHARGE_TIME_S,

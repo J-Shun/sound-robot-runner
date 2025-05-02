@@ -170,17 +170,21 @@ const GameCanvas = () => {
       const patrolBot = patrolBotRef.current;
 
       // 碰撞判斷
+      let playerSpeed = PLAYER_SPEED;
+      if (score > 1500) {
+        playerSpeed = PLAYER_SPEED * 1.5;
+      }
       if (player && patrolBot && flameGun) {
         // 玩家左移
         if (isLeftKeyDown.current && player.x > 0) {
-          player.x -= PLAYER_SPEED;
-          flameGun.x -= PLAYER_SPEED;
+          player.x -= playerSpeed;
+          flameGun.x -= playerSpeed;
         }
 
         // 玩家右移
         if (isRightKeyDown.current && player.x < GAME_WIDTH - player.width) {
-          player.x += PLAYER_SPEED;
-          flameGun.x += PLAYER_SPEED;
+          player.x += playerSpeed;
+          flameGun.x += playerSpeed;
         }
 
         // 玩家跳躍
@@ -200,7 +204,7 @@ const GameCanvas = () => {
         if (score > 1000) {
           patrolSpeed = PATROL_BOT_SPEED * 1.6;
         } else if (score > 2000) {
-          patrolSpeed = PATROL_BOT_SPEED * 2;
+          patrolSpeed = PATROL_BOT_SPEED * 2.2;
         }
         patrolBot.x -= patrolSpeed;
         if (patrolBot.x < -patrolBot.width) {
