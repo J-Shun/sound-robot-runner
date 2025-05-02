@@ -7,7 +7,7 @@ import rollingBot2 from '../assets/robot/rolling-bot-body-2.png?url';
 
 const allAssetUrls = [rollingBot1, rollingBot2];
 
-export function RollingBotSprite() {
+export function RollingBotSprite({ isGameOver }: { isGameOver: boolean }) {
   const robotRef = useRef<AnimatedSprite | null>(null);
   const [robotTextures, setRobotTextures] = useState<Texture[]>([]);
 
@@ -37,6 +37,13 @@ export function RollingBotSprite() {
       robotSprite.stop();
     };
   }, [robotTextures]);
+
+  useEffect(() => {
+    if (robotTextures.length === 0 || !robotRef.current) return;
+    if (isGameOver) {
+      robotRef.current.stop(); // 停止動畫
+    }
+  }, [isGameOver, robotTextures]);
 
   return (
     // 因為 anchor 設置在中心 0.5，圖片往左上角位移，所以要將 x, y 加上角色寬度和高度的一半

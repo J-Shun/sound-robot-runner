@@ -42,7 +42,7 @@ const effect = [
   flameEffecr6,
 ];
 
-export function FlameGun() {
+export function FlameGun({ isGameOver }: { isGameOver: boolean }) {
   const flameGunRef = useRef<AnimatedSprite | null>(null);
   const effctRef = useRef<AnimatedSprite | null>(null);
   const [flameGunChargeTextures, setFlameGunChargeTextures] = useState<
@@ -66,6 +66,10 @@ export function FlameGun() {
     let animationFrameId: number;
 
     const update = () => {
+      if (isGameOver) {
+        cancelAnimationFrame(animationFrameId);
+        return;
+      }
       const flameGunSprite = flameGunRef.current!;
       const effectSprite = effctRef.current!;
 

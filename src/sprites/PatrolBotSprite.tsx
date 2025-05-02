@@ -7,7 +7,7 @@ import patrolBot2 from '../assets/enemy/patrol-robot2.png?url';
 
 const allAssetUrls = [patrolBot1, patrolBot2];
 
-export function PatrolBotSprite() {
+export function PatrolBotSprite({ isGameOver }: { isGameOver: boolean }) {
   const patrolBotRef = useRef<AnimatedSprite | null>(null);
   const [patrolBotTextures, setPatrolBotTextures] = useState<Texture[]>([]);
 
@@ -18,7 +18,6 @@ export function PatrolBotSprite() {
     Promise.all(allAssetUrls.map((url) => Assets.load(url))).then(
       (textures) => {
         const robot = [textures[0], textures[1]];
-
         setPatrolBotTextures(robot);
       }
     );
@@ -39,9 +38,18 @@ export function PatrolBotSprite() {
     };
   }, [patrolBotTextures]);
 
+  useEffect(() => {
+    if (isGameOver && patrolBotRef.current) {
+      patrolBotRef.current.stop(); // 停止動畫
+    }
+  }, [isGameOver]);
+
   return (
     // 因為 anchor 設置在中心 0.5，圖片往左上角位移，所以要將 x, y 加上角色寬度和高度的一半
-    <pixiContainer x={PATROL_BOT_WIDTH / 2} y={PATROL_BOT_HEIGHT / 2}>
+    <pixiContainer
+      x={PATROL_BOT_WIDTH / 2}
+      y={PATROL_BOT_HEIGHT / 2}
+    >
       {isLoaded && (
         <pixiAnimatedSprite
           ref={patrolBotRef}

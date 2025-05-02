@@ -1,11 +1,11 @@
 import { Assets, Texture, TilingSprite } from 'pixi.js';
 import { useEffect, useState, useRef } from 'react';
-import { GAME_WIDTH, GROUND_Y, SPEED } from '../constants/config';
+import { GAME_WIDTH, GROUND_Y, BACKGROUND_SPEED } from '../constants/config';
 
 import desertTile from '../assets/desert-tile-3x.png?url';
 import desertColorTile from '../assets/desert-color-tile-3x.png?url';
 
-export function DesertTile() {
+export function DesertTile({ isGameOver }: { isGameOver: boolean }) {
   const [groundTexture, setGroundTexture] = useState<Texture | null>(null);
   const [groundColorTexture, setGroundColorTexture] = useState<Texture | null>(
     null
@@ -28,16 +28,20 @@ export function DesertTile() {
     let animationFrameId: number;
 
     const updateFrame = () => {
+      if (isGameOver) {
+        cancelAnimationFrame(animationFrameId);
+        return;
+      }
       if (tileRef.current) {
-        tileRef.current.tilePosition.x -= SPEED;
-        tileColorRef.current!.tilePosition.x -= SPEED;
+        tileRef.current.tilePosition.x -= BACKGROUND_SPEED;
+        tileColorRef.current!.tilePosition.x -= BACKGROUND_SPEED;
       }
       animationFrameId = requestAnimationFrame(updateFrame);
     };
 
     animationFrameId = requestAnimationFrame(updateFrame);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [groundTexture]);
+  }, [groundTexture, isGameOver]);
 
   return (
     <pixiContainer>

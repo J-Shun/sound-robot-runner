@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { Application } from '@pixi/react';
-import { Container } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import { RollingBotSprite } from '../sprites/RollingBotSprite';
 import { FlameGun } from '../sprites/FlameGun';
 import { PatrolBotSprite } from '../sprites/PatrolBotSprite';
 import { DesertTile } from '../sprites/DesertTile';
 import { RuinBackground } from '../sprites/RuinBackground';
 import { SunsetBackground } from '../sprites/SunsetBackground';
+import { PlayerHP } from '../sprites/PlayerHP';
 import {
   GRAVITY,
   PLAYER_ORIGINAL_X,
   MAX_JUMP_FORCE,
-  SPEED,
+  PATROL_BOT_SPEED,
   GAME_WIDTH,
   PLAYER_ORIGINAL_Y,
   PATROL_BOT_Y,
@@ -19,11 +20,15 @@ import {
   FLAME_GUN_ORIGINAL_X,
   FLAME_GUN_ORIGINAL_Y,
   FLAME_GUN_WIDTH,
+  PLAYER_HP,
+  HP_BAR_X,
+  HP_BAR_Y,
 } from '../constants';
 
 const GameCanvas = () => {
   // 狀態管理
   const [score, setScore] = useState(0); // 分數
+  const [isGameOver, setIsGameOver] = useState(false);
 
   const robotRef = useRef<Container>(null);
   const flameGunRef = useRef<Container>(null);
@@ -42,6 +47,9 @@ const GameCanvas = () => {
   const playerInvincibleRef = useRef(false);
   const patrolBotInvincibleRef = useRef(false);
 
+  const playerHpRef = useRef<number>(5); // 玩家初始 5 點 HP
+  const patrolBotHpRef = useRef<number>(3); // 巡邏機器人初始 3 點 HP
+
   // 無敵狀態處理
   const startInvincibility = (
     sprite: Container,
@@ -49,13 +57,12 @@ const GameCanvas = () => {
   ) => {
     invincibleRef.current = true;
     let elapsed = 0;
-    const flickerInterval = 50; // 每50ms閃爍一次
-    const totalDuration = 100; // 無敵持續時間 100ms
+    const flickerInterval = 75; // 閃爍間隔
+    const totalDuration = 125; // 無敵持續時間
 
     const flicker = () => {
-      if (sprite) {
-        sprite.tint = sprite.tint === 0xffffff ? 0xff0000 : 0xffffff; // 紅色和白色之間切換
-      }
+      if (!sprite) return;
+      sprite.tint = sprite.tint === 0xffffff ? 0xff0000 : 0xffffff; // 顏色之間切換
     };
 
     const intervalId = setInterval(() => {
@@ -105,6 +112,7 @@ const GameCanvas = () => {
     let animationFrameId: number;
 
     const update = () => {
+      if (isGameOver) return;
       const now = Date.now();
 
       if (startTimeRef.current === null) {
@@ -124,12 +132,13 @@ const GameCanvas = () => {
 
       // 碰撞判斷
       if (player && patrolBot && flameGun) {
-        // 玩家左右移動
+        // 玩家左移
         if (isLeftKeyDown.current && player.x > 0) {
           player.x -= PLAYER_SPEED;
           flameGun.x -= PLAYER_SPEED;
         }
 
+        // 玩家右移
         if (isRightKeyDown.current && player.x < GAME_WIDTH - player.width) {
           player.x += PLAYER_SPEED;
           flameGun.x += PLAYER_SPEED;
@@ -148,7 +157,7 @@ const GameCanvas = () => {
         }
 
         // 更新巡邏機器人位置
-        patrolBot.x -= SPEED;
+        patrolBot.x -= PATROL_BOT_SPEED;
         if (patrolBot.x < -patrolBot.width) {
           patrolBot.x = GAME_WIDTH;
         }
@@ -176,9 +185,16 @@ const GameCanvas = () => {
           currentTime - playerLastHitTimeRef.current > 100 &&
           !playerInvincibleRef.current
         ) {
+          playerHpRef.current -= 1;
+          if (playerHpRef.current <= 0) {
+            setIsGameOver(true);
+          }
+
           // 玩家後退
-          player.x -= 16;
-          flameGun.x -= 16;
+          if (player.x > 0 && playerHpRef.current > 0) {
+            player.x -= 16;
+            flameGun.x -= 16;
+          }
           // 更新玩家最後被擊中的時間
           playerLastHitTimeRef.current = currentTime;
           startInvincibility(player, playerInvincibleRef);
@@ -190,11 +206,19 @@ const GameCanvas = () => {
           currentTime - patrolBotLastHitTimeRef.current > 100 &&
           !patrolBotInvincibleRef.current
         ) {
-          // 敵人後退
+          // 敵人後退 & 扣血
           patrolBot.x += 16;
-          // 更新敵人最後被擊中的時間
-          patrolBotLastHitTimeRef.current = currentTime;
-          startInvincibility(patrolBot, patrolBotInvincibleRef);
+          patrolBotHpRef.current -= 1;
+
+          if (patrolBotHpRef.current <= 0) {
+            // HP 歸 0，敵人回到起始位置
+            patrolBot.x = GAME_WIDTH;
+            patrolBotHpRef.current = 3;
+          } else {
+            // 更新敵人最後被擊中的時間
+            patrolBotLastHitTimeRef.current = currentTime;
+            startInvincibility(patrolBot, patrolBotInvincibleRef);
+          }
         }
       }
 
@@ -203,7 +227,7 @@ const GameCanvas = () => {
 
     animationFrameId = requestAnimationFrame(update);
     return () => cancelAnimationFrame(animationFrameId); // 清除動畫幀
-  }, []);
+  }, [isGameOver]);
 
   return (
     <Application
@@ -219,29 +243,12 @@ const GameCanvas = () => {
 
       {/* 廢墟背景 */}
       <pixiContainer>
-        <RuinBackground />
+        <RuinBackground isGameOver={isGameOver} />
       </pixiContainer>
 
       {/* 沙漠地面 */}
       <pixiContainer>
-        <DesertTile />
-      </pixiContainer>
-
-      {/* 玩家角色 */}
-      <pixiContainer
-        ref={robotRef}
-        x={PLAYER_ORIGINAL_X}
-        y={PLAYER_ORIGINAL_Y}
-      >
-        <RollingBotSprite />
-      </pixiContainer>
-      {/* 火焰槍 */}
-      <pixiContainer
-        ref={flameGunRef}
-        x={FLAME_GUN_ORIGINAL_X}
-        y={FLAME_GUN_ORIGINAL_Y}
-      >
-        <FlameGun />
+        <DesertTile isGameOver={isGameOver} />
       </pixiContainer>
 
       {/* 敵人 */}
@@ -250,7 +257,24 @@ const GameCanvas = () => {
         x={GAME_WIDTH}
         y={PATROL_BOT_Y}
       >
-        <PatrolBotSprite />
+        <PatrolBotSprite isGameOver={isGameOver} />
+      </pixiContainer>
+
+      {/* 玩家角色 */}
+      <pixiContainer
+        ref={robotRef}
+        x={PLAYER_ORIGINAL_X}
+        y={PLAYER_ORIGINAL_Y}
+      >
+        <RollingBotSprite isGameOver={isGameOver} />
+      </pixiContainer>
+      {/* 火焰槍 */}
+      <pixiContainer
+        ref={flameGunRef}
+        x={FLAME_GUN_ORIGINAL_X}
+        y={FLAME_GUN_ORIGINAL_Y}
+      >
+        <FlameGun isGameOver={isGameOver} />
       </pixiContainer>
 
       {/* 計分器 */}
@@ -263,6 +287,31 @@ const GameCanvas = () => {
           style={{
             fontSize: 16,
             fill: '#000000',
+          }}
+        />
+      </pixiContainer>
+
+      {/* HP UI */}
+      <pixiContainer
+        y={HP_BAR_Y}
+        x={HP_BAR_X}
+      >
+        <PlayerHP />
+        <pixiGraphics
+          x={50}
+          draw={(graphics: Graphics) => {
+            const width = 36;
+            const height = 14;
+            const gap = 5;
+
+            graphics.clear(); // 確保重繪時不會堆疊
+
+            for (let i = 0; i < PLAYER_HP; i++) {
+              const x = i * (width + gap);
+              const color = playerHpRef.current > i ? '#f2eda7' : '#282828';
+              graphics.rect(x, 0, width, height);
+              graphics.fill({ color: color });
+            }
           }}
         />
       </pixiContainer>
